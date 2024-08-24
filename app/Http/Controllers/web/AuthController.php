@@ -25,10 +25,16 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email này đã được đăng ký', 'status' => false]);
         }
         $verification_code = rand(100000, 999999);
-        $user = new UserVerificationModel();
-        $user->email = $request->get('email');
-        $user->verification_code = $verification_code;
-        $user->save();
+        $veriCode = UserVerificationModel::where('email',$request->get('email'))->first();
+        if (isset($veriCode)){
+            $veriCode->verification_code = $verification_code;
+            $veriCode->save();
+        }else{
+            $user = new UserVerificationModel();
+            $user->email = $request->get('email');
+            $user->verification_code = $verification_code;
+            $user->save();
+        }
 
         Mail::to($request->get('email'))->send(new VerificationCodes($verification_code));
 
@@ -38,7 +44,7 @@ class AuthController extends Controller
     public function verifyCode(Request $request)
     {
         $verification = UserVerificationModel::where('email', $request->get('email'))
-            ->where('verification_codes', $request->get('verification_code'))
+            ->where('verification_code', $request->get('verification_code'))
             ->first();
 
         if (!$verification) {
