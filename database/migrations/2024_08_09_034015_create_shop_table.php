@@ -25,7 +25,7 @@ return new class extends Migration
             $table->longText('content')->nullable();
             $table->string('avatar')->nullable();
             $table->string('banner')->nullable();
-            $table->string('src')->nullable();
+            $table->longText('src')->nullable();
             $table->integer('display')->default(1);
             $table->timestamps();
         });

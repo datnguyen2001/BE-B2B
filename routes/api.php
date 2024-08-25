@@ -62,6 +62,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-shop', [ShopController::class, 'getShop']);
     Route::post('create-shop', [ShopController::class, 'createShop']);
     Route::post('update-shop', [ShopController::class, 'updateShop']);
+    Route::post('delete-src-shop', [ShopController::class, 'deleteSrcShop']);
     Route::get('get-product', [ShopController::class, 'getProduct']);
     Route::post('create-product', [ShopController::class, 'createProduct']);
     Route::post('update-product/{id}', [ShopController::class, 'updateProduct']);

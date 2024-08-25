@@ -42,11 +42,12 @@ class ShopController extends Controller
         try{
             $user = JWTAuth::user();
             $data = ShopModel::where('user_id',$user->id)->first();
+            $data->src = json_decode($data->src, true);
             if ($data->display == 0){
                 return response()->json(['message'=>'Cửa hàng của bạn đã bị xóa','status'=>true]);
             }
-            return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
 
+            return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
         }catch (\Exception $e){
             return response()->json(['message'=>$e->getMessage(),'status'=>false]);
         }
@@ -65,14 +66,17 @@ class ShopController extends Controller
                 $file = $request->file('banner');
                 $banner = Storage::url($file->store('shop', 'public'));
             }else{
-                return response()->json(['message' => 'Vui lòng thêm ảnh avatar', 'status' => false]);
+                return response()->json(['message' => 'Vui lòng thêm ảnh banner', 'status' => false]);
             }
             if ($request->hasFile('src')) {
-                $file = $request->file('src');
-                $src = Storage::url($file->store('shop', 'public'));
+                foreach ($request->file('src') as $file) {
+                    $imagePath = Storage::url($file->store('shop', 'public'));
+                    $srcArray[] = $imagePath;
+                }
             }else{
-                return response()->json(['message' => 'Vui lòng thêm ảnh avatar', 'status' => false]);
+                return response()->json(['message' => 'Vui lòng thêm ảnh shop', 'status' => false]);
             }
+
             $user = JWTAuth::user();
             $shop = new ShopModel();
             $shop->user_id = $user->id;
@@ -87,7 +91,7 @@ class ShopController extends Controller
             $shop->content = $request->get('content');
             $shop->avatar = $avatar;
             $shop->banner = $banner;
-            $shop->src = $src;
+            $shop->src = json_encode($srcArray);
             $shop->save();
 
             return response()->json(['message' => 'Tạo cửa hàng thành công', 'status' => true]);
@@ -116,13 +120,15 @@ class ShopController extends Controller
                 }
                 $shop->banner = $banner;
             }
-            if ($request->hasFile('src')){
-                $file = $request->file('src');
-                $src = Storage::url($file->store('shop', 'public'));
-                if (isset($shop->src) && Storage::exists(str_replace('/storage', 'public', $shop->src))) {
-                    Storage::delete(str_replace('/storage', 'public', $shop->src));
+            $existingSrc = json_decode($shop->src, true) ?? [];
+            $newSrcArray = [];
+            if ($request->hasFile('src')) {
+                foreach ($request->file('src') as $file) {
+                    $imagePath = Storage::url($file->store('shop', 'public'));
+                    $newSrcArray[] = $imagePath;
                 }
-                $shop->src = $src;
+                $finalSrcArray = array_merge($existingSrc, $newSrcArray);
+                $shop->src = json_encode($finalSrcArray);
             }
             if ($request->has('name')) {
                 $shop->name = $request->get('name');
@@ -154,6 +160,32 @@ class ShopController extends Controller
             $shop->save();
 
             return response()->json(['message' => 'Cập nhật cửa hàng thành công', 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function deleteSrcShop(Request $request)
+    {
+        try {
+            $user = JWTAuth::user();
+            $shop = ShopModel::where('user_id',$user->id)->first();
+            if (!$shop) {
+                return response()->json(['message' => 'Shop không tồn tại', 'status' => false]);
+            }
+            $existingSrc = json_decode($shop->src, true) ?? [];
+            $imagesToDelete = json_decode($request->input('src', []));
+            $remainingSrc = array_diff($existingSrc, $imagesToDelete);
+            $remainingSrc = array_values($remainingSrc);
+            $shop->src = json_encode($remainingSrc);
+            $shop->save();
+            foreach ($imagesToDelete as $image) {
+                $filePath = str_replace('/storage', 'public', $image);
+                Storage::delete($filePath);
+            }
+
+            return response()->json(['message' => 'Xóa ảnh shop thành công', 'status' => true]);
+
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }
@@ -276,9 +308,6 @@ class ShopController extends Controller
             }
             if ($request->has('category_id')) {
                 $product->category_id = $request->get('category_id');
-            }
-            if ($request->has('unit')) {
-                $product->unit = $request->get('unit');
             }
             if ($request->has('unit')) {
                 $product->unit = $request->get('unit');
