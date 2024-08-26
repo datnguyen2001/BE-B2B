@@ -37,6 +37,7 @@ Route::get('product-for-you', [ProductsController::class, 'productForYou']);
 Route::get('search-product', [ProductsController::class, 'searchProduct']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
+Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
 
 Route::get('province', [AddressController::class, 'province']);
 Route::get('district/{province_id}', [AddressController::class, 'district']);
@@ -74,7 +75,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('set-product-discount/{id}', [ShopController::class, 'setProductDiscount']);
     Route::get('search-product-shop', [ShopController::class, 'searchProductShop']);
 
-    Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
     Route::get('get-request-supplier-user', [RequestSupplierController::class, 'getRequestSupplierUser']);
     Route::post('create-request-supplier', [RequestSupplierController::class, 'createRequestSupplier']);
     Route::get('edit-request-supplier-user/{id}', [RequestSupplierController::class, 'editRequestSupplierUser']);

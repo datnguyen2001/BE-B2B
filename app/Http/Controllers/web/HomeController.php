@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BannerModel;
 use App\Models\CategoryModel;
 use App\Models\TrademarkModel;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -39,7 +40,13 @@ class HomeController extends Controller
     public function category()
     {
         try {
-            $data = CategoryModel::where('display',1)->take(14)->get();
+            $data = DB::table('category as c')
+                ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
+                ->where('c.display', 1)
+                ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->groupBy('c.id', 'c.name')
+                ->take(14)
+                ->get();
 
             return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
         } catch (\Exception $e) {

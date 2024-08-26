@@ -74,7 +74,7 @@ class CartController extends Controller
                             'pa.price as attribute_price',
                             'pd.discount',
                             'pd.number',
-                            DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as final_price')
+                            DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
                         )
                         ->first();
 
@@ -294,7 +294,7 @@ class CartController extends Controller
                             'p.en_unit',
                             'pa.price as attribute_price',
                             'pd.discount',
-                            DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as final_price')
+                            DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
                         )
                         ->first();
 
@@ -352,7 +352,7 @@ class CartController extends Controller
                 'p.shop_id',
                 'pa.price as attribute_price',
                 'pd.discount',
-                DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as final_price')
+                DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
             )
             ->first();
         $product->quantity = $quantity;

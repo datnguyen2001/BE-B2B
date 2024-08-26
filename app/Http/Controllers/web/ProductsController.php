@@ -54,7 +54,8 @@ class ProductsController extends Controller
                     'p.status',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -117,7 +118,8 @@ class ProductsController extends Controller
                     'p.status',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -195,7 +197,8 @@ class ProductsController extends Controller
                     'p.status',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name',
@@ -272,7 +275,8 @@ class ProductsController extends Controller
                     'p.src',
                     'pa.quantity as min_quantity',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
-                    DB::raw('pa.price - (pa.price * IFNULL(pd.discount, 0) / 100) as price'),
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as price'),
+                    'pa.price as price_original',
                     's.name as shop_name',
                     'pr.name as province_name'
                 )->where('p.display', '=', 1)
@@ -328,7 +332,8 @@ class ProductsController extends Controller
                     'p.status',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -444,7 +449,8 @@ class ProductsController extends Controller
                         'p.quantity',
                         'p.src',
                         'pa.quantity as min_quantity',
-                        DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                        DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                        'pa.price as price_original',
                         DB::raw('IFNULL(pd.discount, 0) as discount'),
                         's.name as shop_name',
                         'pr.name as province_name'
@@ -489,7 +495,8 @@ class ProductsController extends Controller
                     'p.quantity',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -535,7 +542,8 @@ class ProductsController extends Controller
                     'p.quantity',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -599,7 +607,8 @@ class ProductsController extends Controller
                     'p.quantity',
                     'p.src',
                     'pa.quantity as min_quantity',
-                    DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                    'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     'pr.name as province_name'
@@ -670,7 +679,8 @@ class ProductsController extends Controller
                 'p.quantity',
                 'p.src',
                 'pa.quantity as min_quantity',
-                DB::raw('IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price) as price'),
+                DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'),
+                'pa.price as price_original',
                 DB::raw('IFNULL(pd.discount, 0) as discount'),
                 's.name as shop_name',
                 'pr.name as province_name'
