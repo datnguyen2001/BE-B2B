@@ -44,7 +44,7 @@ class HomeController extends Controller
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
                 ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
-                ->groupBy('c.id', 'c.name')
+                ->groupBy('c.id', 'c.name','c.name_en')
                 ->take(14)
                 ->get();
 
