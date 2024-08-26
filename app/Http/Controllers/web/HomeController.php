@@ -45,8 +45,7 @@ class HomeController extends Controller
                 ->where('c.display', 1)
                 ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
                 ->groupBy('c.id', 'c.name','c.name_en','c.slug','c.src')
-                ->take(14)
-                ->get();
+                ->paginate(14);
 
             return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
         } catch (\Exception $e) {

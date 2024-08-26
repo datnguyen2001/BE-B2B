@@ -58,7 +58,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->where('p.display', '=', 1)
                 ->where('p.status', '=', 1)
@@ -122,7 +122,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->where('p.display', '=', 1)
                 ->where('p.status', '=', 1)
@@ -201,7 +201,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name',
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
                     'p.created_at'
                 )
                 ->where('p.display', '=', 1)
@@ -278,7 +278,7 @@ class ProductsController extends Controller
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as price'),
                     'pa.price as price_original',
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )->where('p.display', '=', 1)
                 ->where('s.display', '=', 1)
                 ->where('p.status', '=', 1);
@@ -336,7 +336,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )->where('p.display', '=', 1)
                 ->where('s.display', '=', 1)
                 ->where('p.status', '=', 1);
@@ -456,7 +456,7 @@ class ProductsController extends Controller
                         'pa.price as price_original',
                         DB::raw('IFNULL(pd.discount, 0) as discount'),
                         's.name as shop_name',
-                        'pr.name as province_name'
+                        DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                     )
                     ->whereIn('p.id', $viewItemProduct)
                     ->where('p.display', '=', 1)
@@ -502,7 +502,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->where('s.id', $product->shop_id)
                 ->where('p.display', '=', 1)
@@ -549,7 +549,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->where('p.category_id', $product->category_id)
                 ->where('p.display', '=', 1)
@@ -614,7 +614,7 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    'pr.name as province_name'
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->whereIn('p.id', $viewItemProduct)
                 ->where('p.display', '=', 1)
@@ -686,7 +686,7 @@ class ProductsController extends Controller
                 'pa.price as price_original',
                 DB::raw('IFNULL(pd.discount, 0) as discount'),
                 's.name as shop_name',
-                'pr.name as province_name'
+                DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
             )
             ->whereIn('p.id', $favoriteProducts)
             ->where('p.display', '=', 1)

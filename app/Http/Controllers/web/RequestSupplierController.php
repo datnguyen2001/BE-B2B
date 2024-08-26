@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RequestSupplierModel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Stichoza\GoogleTranslate\GoogleTranslate;
@@ -15,7 +16,15 @@ class RequestSupplierController extends Controller
 {
     public function getRequestSupplier(){
         try{
-            $data = RequestSupplierModel::where('display',1)->where('status',1)->orderby('created_at','desc')->paginate(20);
+            $data = RequestSupplierModel::where('request_supplier.display', 1)
+                ->where('request_supplier.status', 1)
+                ->leftJoin('province', 'request_supplier.scope', '=', 'province.province_id')
+                ->select(
+                    'request_supplier.*',
+                    DB::raw("IF(request_supplier.scope = 0, 'Toàn quốc', IFNULL(province.name, 'Toàn quốc')) as scope_name")
+                )
+                ->orderby('request_supplier.created_at', 'desc')
+                ->paginate(12);
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
             }
@@ -30,7 +39,14 @@ class RequestSupplierController extends Controller
     public function getRequestSupplierUser(){
         try{
             $user = JWTAuth::user();
-            $data = RequestSupplierModel::where('user_id',$user->id)->orderby('created_at','desc')->paginate(20);
+            $data = RequestSupplierModel::where('user_id', $user->id)
+                ->leftJoin('province', 'request_supplier.scope', '=', 'province.province_id')
+                ->select(
+                    'request_supplier.*',
+                    DB::raw("IF(request_supplier.scope = 0, 'Toàn quốc', IFNULL(province.name, 'Toàn quốc')) as scope_name")
+                )
+                ->orderBy('request_supplier.created_at', 'desc')
+                ->paginate(20);
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
             }
