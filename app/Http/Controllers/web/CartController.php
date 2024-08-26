@@ -142,7 +142,7 @@ class CartController extends Controller
             ];
         }
         $cartItemsJson = json_encode($cartItems);
-        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30);
+        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30,'/', env('SESSION_DOMAIN'), true, true);
 
         return response()->json(['message' => 'Sản phẩm đã được thêm vào giỏ hàng', 'status' => true, 'cart' => $cartItems]);
     }
@@ -184,7 +184,7 @@ class CartController extends Controller
         }
 
         $cartItemsJson = json_encode($updatedCartItems);
-        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30);
+        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30,'/', env('SESSION_DOMAIN'),true,true);
 
         return response()->json(['message' => 'Sản phẩm đã được xóa khỏi giỏ hàng', 'status' => true, 'cart' => $updatedCartItems]);
     }
@@ -199,7 +199,7 @@ class CartController extends Controller
             return $item['shop_id'] != $shopId;
         });
         $cartItemsJson = json_encode(array_values($cartItems));
-        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30);
+        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30,'/', env('SESSION_DOMAIN'), true, true);
 
         return response()->json(['message' => 'Tất cả sản phẩm của cửa hàng đã được xóa khỏi giỏ hàng', 'status' => true, 'cart' => $cartItems]);
     }
@@ -234,7 +234,7 @@ class CartController extends Controller
         }
 
         $cartItemsJson = json_encode(array_values($cartItems));
-        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30);
+        Cookie::queue('cartItems', $cartItemsJson, 60 * 24 * 30,'/', env('SESSION_DOMAIN'), true, true);
 
         return response()->json(['message' => 'Số lượng sản phẩm trong giỏ hàng đã được cập nhật', 'status' => true, 'cart' => $cartItems]);
     }
