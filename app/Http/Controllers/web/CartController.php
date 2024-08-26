@@ -71,6 +71,7 @@ class CartController extends Controller
                             'p.name_en',
                             'p.unit',
                             'p.en_unit',
+                            'p.src',
                             'pa.price as attribute_price',
                             'pd.discount',
                             'pd.number',
@@ -92,7 +93,8 @@ class CartController extends Controller
                                 'unit_en' => $product->en_unit,
                                 'quantity' => $discountedQuantity,
                                 'discount' => $product->discount,
-                                'price' => $product->final_price
+                                'price' => $product->final_price,
+                                'src' => json_decode($product->src, true),
                             ];
                         }
 
@@ -105,7 +107,8 @@ class CartController extends Controller
                                 'unit_en' => $product->en_unit,
                                 'quantity' => $fullPriceQuantity,
                                 'discount' => 0,
-                                'price' => $product->attribute_price
+                                'price' => $product->attribute_price,
+                                'src' => json_decode($product->src, true),
                             ];
                         }
                     }
@@ -292,6 +295,7 @@ class CartController extends Controller
                             'p.name_en',
                             'p.unit',
                             'p.en_unit',
+                            'p.src',
                             'pa.price as attribute_price',
                             'pd.discount',
                             DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
@@ -308,7 +312,8 @@ class CartController extends Controller
                             'quantity' => $quantity,
                             'original_price' => $product->attribute_price ?? 0,
                             'discount' => $product->discount,
-                            'price' => $product->final_price
+                            'price' => $product->final_price,
+                            'src' => json_decode($product->src, true),
                         ];
                     }
                 }
@@ -350,12 +355,14 @@ class CartController extends Controller
                 'p.unit',
                 'p.en_unit',
                 'p.shop_id',
+                'p.src',
                 'pa.price as attribute_price',
                 'pd.discount',
                 DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
             )
             ->first();
         $product->quantity = $quantity;
+        $product->src = json_decode($product->src, true);
 
         return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $product, 'status' => true]);
     }
