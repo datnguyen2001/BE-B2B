@@ -392,11 +392,14 @@ class ProductsController extends Controller
                     'shop.phone as shop_phone',
                     'shop.created_at as shop_date',
                     'shop.avatar as shop_avatar',
+                    'shop.content as shop_content',
                     DB::raw("CONCAT_WS(', ', shop.address_detail, wards.name, district.name, province.name) as shop_full_address"),
                     DB::raw('IFNULL(product_discounts.date_start, NULL) as discount_date_start'),
                     DB::raw('IFNULL(product_discounts.date_end, NULL) as discount_date_end'),
                     DB::raw('IFNULL(product_discounts.number, 0) as number_discount'),
-                    DB::raw('IFNULL(product_discounts.discount, 0) as discount')
+                    DB::raw('IFNULL(product_discounts.discount, 0) as discount'),
+                    DB::raw('(SELECT COUNT(*) FROM products WHERE shop_id = shop.id) as total_products_shop'),
+                    DB::raw('(SELECT COUNT(*) FROM follow_shops WHERE shop_id = shop.id) as total_followers_shop')
                 )
                 ->first();
             if (!$product) {
