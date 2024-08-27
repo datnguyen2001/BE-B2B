@@ -389,7 +389,7 @@ class CartController extends Controller
                             });
                     });
             })
-            ->leftJoin('shops as s', 'p.shop_id', '=', 's.id')
+            ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
             ->where('p.id', $productId)
             ->select(
                 'p.id',
