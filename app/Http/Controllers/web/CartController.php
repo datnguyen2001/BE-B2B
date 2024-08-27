@@ -93,6 +93,7 @@ class CartController extends Controller
                                 'unit' => $product->unit,
                                 'unit_en' => $product->en_unit,
                                 'quantity' => $discountedQuantity,
+                                'inventory_quantity' => $product->inventory_quantity,
                                 'discount' => $product->discount,
                                 'price' => $product->final_price,
                                 'src' => json_decode($product->src, true),
@@ -107,6 +108,7 @@ class CartController extends Controller
                                 'unit' => $product->unit,
                                 'unit_en' => $product->en_unit,
                                 'quantity' => $fullPriceQuantity,
+                                'inventory_quantity' => $product->inventory_quantity,
                                 'discount' => 0,
                                 'price' => $product->attribute_price,
                                 'src' => json_decode($product->src, true),
@@ -437,6 +439,7 @@ class CartController extends Controller
                 }
             }
 
+            $cartItems = json_decode($request->cookie('cartItems'), true);
             foreach ($request->get('shop_items') as $shopItem) {
                 $shopId = $shopItem['shop_id'];
 
@@ -493,6 +496,18 @@ class CartController extends Controller
                             ->where('id', $productDiscount->id)
                             ->update(['number' => $remainingQuantity]);
                     }
+                    // Xóa sản phẩm đã mua khỏi giỏ hàng
+                    if (isset($cartItems[$shopId])) {
+                        foreach ($cartItems[$shopId] as $key => $item) {
+                            if ($item['product_id'] == $productId) {
+                                unset($cartItems[$shopId][$key]);
+                            }
+                        }
+                        // Xóa shop nếu không còn sản phẩm
+                        if (empty($cartItems[$shopId])) {
+                            unset($cartItems[$shopId]);
+                        }
+                    }
                 }
                 $order->commodity_money = $orderTotalMoney;
                 $order->total_payment = $orderTotalMoney + $order->shipping_fee;
@@ -511,6 +526,8 @@ class CartController extends Controller
             $order_total->exchange_points = $request->get('exchange_points');
             $order_total->total_payment = $totalPayment;
             $order_total->save();
+
+            Cookie::queue('cartItems', json_encode($cartItems), 60 * 24 * 7, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
 
             return response()->json(['message' => 'Tạo đơn hàng thành công', 'status' => true]);
         }catch(\Exception $e){
