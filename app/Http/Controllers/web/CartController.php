@@ -407,24 +407,27 @@ class CartController extends Controller
             )
             ->first();
         $product->quantity = $quantity;
-        $product->src = json_decode($product->src, true);
         $shopDetails = [
-            'shop_id' => $product->shop_id,
-            'shop_name' => $product->shop_name,
-            'products' => [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'name_en' => $product->name_en,
-                'unit' => $product->unit,
-                'unit_en' => $product->en_unit,
-                'quantity' => $quantity,
-                'inventory_quantity' => $product->inventory_quantity,
-                'original_price' => $product->attribute_price ?? 0,
-                'discount' => $product->discount,
-                'price' => $product->final_price,
-                'src' => json_decode($product->src, true),
+            [
+                'shop_id' => $product->shop_id,
+                'shop_name' => $product->shop_name,
+                'products' => [
+                    [
+                        'product_id' => $product->id,
+                        'name' => $product->name,
+                        'name_en' => $product->name_en,
+                        'unit' => $product->unit,
+                        'unit_en' => $product->en_unit,
+                        'quantity' => $quantity,
+                        'inventory_quantity' => $product->inventory_quantity,
+                        'original_price' => $product->attribute_price ?? 0,
+                        'discount' => $product->discount,
+                        'price' => $product->final_price,
+                        'src' => json_decode($product->src, true),
+                    ]
+                ]
             ]
-        ];
+            ];
 
         return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $shopDetails, 'status' => true]);
     }
