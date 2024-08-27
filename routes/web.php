@@ -31,6 +31,7 @@ Route::post('api/update-cart-quantity', [CartController::class, 'updateCartQuant
 Route::middleware(['jwt.auth'])->group(function () {
     Route::post('api/buy-now', [CartController::class, 'buyNow']);
     Route::post('api/checkout', [CartController::class, 'checkout']);
+    Route::post('api/pay', [CartController::class, 'pay']);
 });
 
 Route::middleware('auth')->group(function () {

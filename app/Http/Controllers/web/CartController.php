@@ -439,7 +439,8 @@ class CartController extends Controller
                 }
             }
 
-            $cartItems = json_decode($request->cookie('cartItems'), true);
+            $cartItemsJson = Cookie::get('cartItems', '[]');
+            $cartItems = json_decode($cartItemsJson, true);
             foreach ($request->get('shop_items') as $shopItem) {
                 $shopId = $shopItem['shop_id'];
 

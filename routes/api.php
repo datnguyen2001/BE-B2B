@@ -93,7 +93,5 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('delete-delivery-address/{id}', [DeliveryAddressController::class, 'deleteDeliveryAddress']);
     Route::get('select-default-address/{id}', [DeliveryAddressController::class, 'selectDefaultAddress']);
 
-    Route::post('pay', [CartController::class, 'pay']);
-
     Route::post('logout', [AuthController::class, 'logout']);
 });
