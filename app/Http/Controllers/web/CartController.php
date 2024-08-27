@@ -72,6 +72,7 @@ class CartController extends Controller
                             'p.unit',
                             'p.en_unit',
                             'p.src',
+                            'p.quantity as inventory_quantity',
                             'pa.price as attribute_price',
                             'pd.discount',
                             'pd.number',
@@ -127,9 +128,33 @@ class CartController extends Controller
         $productId = $request->get('product_id');
         $quantity = $request->get('quantity');
 
+        $product = DB::table('products')
+            ->join('products_attribute', 'products.id', '=', 'products_attribute.product_id')
+            ->where('products.id', $productId)
+            ->where('products.shop_id', $shopId)
+            ->select('products.quantity')
+            ->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Không tìm thấy sản phẩm', 'status' => false]);
+        }
+
         $cartItemsJson = Cookie::has('cartItems') ? Cookie::get('cartItems') : '[]';
         $cartItems = json_decode($cartItemsJson, true);
         $found = false;
+
+        $currentCartQuantity = 0;
+        foreach ($cartItems as $item) {
+            if ($item['product_id'] == $productId && $item['shop_id'] == $shopId) {
+                $currentCartQuantity = $item['quantity'];
+                break;
+            }
+        }
+
+        if ($currentCartQuantity + $quantity > $product->quantity) {
+            return response()->json(['message' => 'Số lượng sản phẩm vượt quá số lượng tồn kho', 'status' => false]);
+        }
+
         foreach ($cartItems as &$item) {
             if ($item['product_id'] == $productId && $item['shop_id'] == $shopId) {
                 $item['quantity'] += $quantity;
@@ -217,10 +242,23 @@ class CartController extends Controller
         $cartItems = json_decode($cartItemsJson, true);
 
         $itemFound = false;
+        $product = DB::table('products')
+            ->join('products_attribute', 'products.id', '=', 'products_attribute.product_id')
+            ->where('products.id', $productId)
+            ->where('products.shop_id', $shopId)
+            ->select('products.quantity')
+            ->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Không tìm thấy sản phẩm', 'status' => false]);
+        }
 
         foreach ($cartItems as &$item) {
             if ($item['product_id'] == $productId && $item['shop_id'] == $shopId) {
                 if ($newQuantity > 0) {
+                    if ($newQuantity > $product->quantity) {
+                        return response()->json(['message' => 'Số lượng sản phẩm vượt quá số lượng tồn kho', 'status' => false]);
+                    }
                     $item['quantity'] = $newQuantity;
                 } else {
                     $cartItems = array_filter($cartItems, function ($cartItem) use ($productId, $shopId) {
@@ -296,6 +334,7 @@ class CartController extends Controller
                             'p.unit',
                             'p.en_unit',
                             'p.src',
+                            'p.quantity as inventory_quantity',
                             'pa.price as attribute_price',
                             'pd.discount',
                             DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
@@ -310,6 +349,7 @@ class CartController extends Controller
                             'unit' => $product->unit,
                             'unit_en' => $product->en_unit,
                             'quantity' => $quantity,
+                            'inventory_quantity' => $product->inventory_quantity,
                             'original_price' => $product->attribute_price ?? 0,
                             'discount' => $product->discount,
                             'price' => $product->final_price,
@@ -356,6 +396,7 @@ class CartController extends Controller
                 'p.en_unit',
                 'p.shop_id',
                 'p.src',
+                'p.quantity as inventory_quantity',
                 'pa.price as attribute_price',
                 'pd.discount',
                 DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price')
@@ -379,6 +420,22 @@ class CartController extends Controller
             $totalProductCost = 0;
             $totalShip = 0;
             $totalPayment = 0;
+
+            // Kiểm tra tồn kho cho tất cả các sản phẩm trước khi tạo đơn hàng
+            foreach ($request->get('shop_items') as $shopItem) {
+                foreach ($shopItem['products'] as $product) {
+                    $productId = $product['product_id'];
+                    $quantity = $product['quantity'];
+
+                    $data_product = ProductsModel::find($productId);
+                    if ($data_product->quantity < $quantity) {
+                        return response()->json([
+                            'message' => "Sản phẩm '{$data_product->name}' có số lượng tồn kho không đủ",
+                            'status' => false
+                        ]);
+                    }
+                }
+            }
 
             foreach ($request->get('shop_items') as $shopItem) {
                 $shopId = $shopItem['shop_id'];
