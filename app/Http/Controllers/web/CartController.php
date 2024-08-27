@@ -389,6 +389,7 @@ class CartController extends Controller
                             });
                     });
             })
+            ->leftJoin('shops as s', 'p.shop_id', '=', 's.id')
             ->where('p.id', $productId)
             ->select(
                 'p.id',
@@ -397,6 +398,7 @@ class CartController extends Controller
                 'p.unit',
                 'p.en_unit',
                 'p.shop_id',
+                's.name as shop_name',
                 'p.src',
                 'p.quantity as inventory_quantity',
                 'pa.price as attribute_price',
@@ -406,8 +408,25 @@ class CartController extends Controller
             ->first();
         $product->quantity = $quantity;
         $product->src = json_decode($product->src, true);
+        $shopDetails = [
+            'shop_id' => $product->shop_id,
+            'shop_name' => $product->shop_name,
+            'products' => [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'name_en' => $product->name_en,
+                'unit' => $product->unit,
+                'unit_en' => $product->en_unit,
+                'quantity' => $quantity,
+                'inventory_quantity' => $product->inventory_quantity,
+                'original_price' => $product->attribute_price ?? 0,
+                'discount' => $product->discount,
+                'price' => $product->final_price,
+                'src' => json_decode($product->src, true),
+            ]
+        ];
 
-        return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $product, 'status' => true]);
+        return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $shopDetails, 'status' => true]);
     }
 
     public function pay(Request $request)
