@@ -498,15 +498,11 @@ class CartController extends Controller
                             ->update(['number' => $remainingQuantity]);
                     }
                     // Xóa sản phẩm đã mua khỏi giỏ hàng
-                    if (isset($cartItems[$shopId])) {
-                        foreach ($cartItems[$shopId] as $key => $item) {
-                            if ($item['product_id'] == $productId) {
-                                unset($cartItems[$shopId][$key]);
+                    if (isset($cartItems)) {
+                        foreach ($cartItems as $key => $item) {
+                            if (is_array($item) && isset($item['product_id']) && $item['product_id'] == $productId) {
+                                unset($cartItems[$key]);
                             }
-                        }
-                        // Xóa shop nếu không còn sản phẩm
-                        if (empty($cartItems[$shopId])) {
-                            unset($cartItems[$shopId]);
                         }
                     }
                 }
