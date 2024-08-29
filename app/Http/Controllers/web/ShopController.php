@@ -25,7 +25,8 @@ class ShopController extends Controller
                 ->where('s.id', $id)
                 ->select(
                     's.*',
-                    DB::raw("CONCAT(s.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address")
+                    DB::raw("CONCAT(s.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
+                    DB::raw("CONCAT( d.name, ', ', p.name) as sub_address")
                 )
                 ->first();
             if ($data->display == 0){
