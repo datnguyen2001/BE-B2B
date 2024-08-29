@@ -42,7 +42,17 @@ class ShopController extends Controller
     public function getShop(){
         try{
             $user = JWTAuth::user();
-            $data = ShopModel::where('user_id',$user->id)->first();
+            $data = DB::table('shop as s')
+                ->join('province as p', 's.province_id', '=', 'p.province_id')
+                ->join('district as d', 's.district_id', '=', 'd.district_id')
+                ->join('wards as w', 's.ward_id', '=', 'w.wards_id')
+                ->where('s.user_id', $user->id)
+                ->select(
+                    's.*',
+                    DB::raw("CONCAT(s.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
+                    DB::raw("CONCAT( d.name, ', ', p.name) as sub_address")
+                )
+                ->first();
             $data->src = json_decode($data->src, true);
             if ($data->display == 0){
                 return response()->json(['message'=>'Cửa hàng của bạn đã bị xóa','status'=>true]);
