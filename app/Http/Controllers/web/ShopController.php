@@ -206,6 +206,14 @@ class ShopController extends Controller
                     GROUP BY product_id
                 )) pa
             "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0);;
+                })
+                ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
+                ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
                 ->where('p.shop_id', $shop->id)
                 ->select(
                     'p.id',
@@ -220,8 +228,11 @@ class ShopController extends Controller
                     'p.display',
                     'p.status',
                     'p.src',
-                    'pa.quantity as min_quantity',
-                    'pa.price as price'
+                    'p.minimum_quantity as min_quantity',
+                    'pa.price as original_price',
+                    DB::raw('IFNULL(pd.discount, 0) as discount'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price'),
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 )
                 ->paginate(20);
             foreach ($data as $item) {
@@ -499,6 +510,14 @@ class ShopController extends Controller
                     GROUP BY product_id
                 )) pa
             "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0);;
+                })
+                ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
+                ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
                 ->where('p.shop_id', $shop->id)
                 ->select(
                     'p.id',
@@ -513,7 +532,11 @@ class ShopController extends Controller
                     'p.display',
                     'p.status',
                     'p.src',
-                    'pa.price as price'
+                    'p.minimum_quantity as min_quantity',
+                    'pa.price as original_price',
+                    DB::raw('IFNULL(pd.discount, 0) as discount'),
+                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price'),
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
                 );
 
             if ($searchTerm) {
