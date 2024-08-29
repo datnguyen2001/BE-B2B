@@ -29,7 +29,7 @@ class ShopController extends Controller
                 )
                 ->first();
             if ($data->display == 0){
-                return response()->json(['message'=>'Cửa hàng của bạn đã bị xóa','status'=>true]);
+                return response()->json(['message'=>'Cửa hàng của bạn đã bị khóa','status'=>true]);
             }
             return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
 

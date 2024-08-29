@@ -35,6 +35,7 @@ Route::get('filter-deal-hot-today', [ProductsController::class, 'filterDealHotTo
 Route::get('filter-Product', [ProductsController::class, 'filterProduct']);
 Route::get('product-for-you', [ProductsController::class, 'productForYou']);
 Route::get('search-product', [ProductsController::class, 'searchProduct']);
+Route::get('get-product-shop/{id}', [HomeController::class, 'getProductShop']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
 Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
