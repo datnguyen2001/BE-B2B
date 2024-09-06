@@ -220,7 +220,7 @@ class ProfileManagementController extends Controller
         }
 
         if ($status) {
-            $ordersQuery->where('status', $status);
+            $ordersQuery->where('o.status', $status);
         }
         $orders = $ordersQuery->orderBy('o.created_at', 'desc')->paginate(10);
 
