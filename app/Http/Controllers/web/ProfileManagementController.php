@@ -153,7 +153,7 @@ class ProfileManagementController extends Controller
                     'ot.type_payment',
                     'o.commodity_money',
                     'o.shipping_fee',
-                    'o.exchange_points',
+                    'ot.exchange_points',
                     'o.total_payment',
                     'o.status',
                     'o.created_at',
