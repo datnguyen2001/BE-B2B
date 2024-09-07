@@ -25,9 +25,9 @@ return new class extends Migration
             $table->longText('note')->nullable();
             $table->string('shipping_unit')->nullable();
             $table->string('order_code_transport')->nullable();
-            $table->decimal('commodity_money', 15, 3)->default(0);
-            $table->decimal('shipping_fee', 15, 3)->default(0);
-            $table->decimal('total_payment', 15, 3)->default(0);
+            $table->integer('commodity_money')->default(0);
+            $table->integer('shipping_fee')->default(0);
+            $table->integer('total_payment')->default(0);
             $table->integer('status')->default(0);
             $table->timestamps();
         });

@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('order_id')->nullable();
             $table->integer('type_payment')->default(1);
-            $table->decimal('total_product', 15, 3)->default(0);
-            $table->decimal('total_shipping_fee', 15, 3)->default(0);
-            $table->decimal('exchange_points', 15, 3)->default(0);
-            $table->decimal('total_payment', 15, 3)->default(0);
+            $table->integer('total_product')->default(0);
+            $table->integer('total_shipping_fee')->default(0);
+            $table->integer('exchange_points')->default(0);
+            $table->integer('total_payment')->default(0);
             $table->timestamps();
         });
     }

@@ -138,6 +138,9 @@ class ProfileManagementController extends Controller
                 ->join('district as d', 'o.district_id', '=', 'd.district_id')
                 ->join('wards as w', 'o.ward_id', '=', 'w.wards_id')
                 ->join('shop as s', 'o.shop_id', '=', 's.id')
+                ->join('order_total as ot', function ($join) use ($id) {
+                    $join->on(DB::raw("FIND_IN_SET(o.id, ot.order_id)"), '>', DB::raw(0));
+                })
                 ->where('o.id', $id)
                 ->select(
                     'o.id as order_id',
@@ -147,7 +150,7 @@ class ProfileManagementController extends Controller
                     DB::raw("CONCAT(o.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
                     'o.note',
                     'o.shipping_unit',
-                    'o.type_payment',
+                    'ot.type_payment',
                     'o.commodity_money',
                     'o.shipping_fee',
                     'o.exchange_points',
