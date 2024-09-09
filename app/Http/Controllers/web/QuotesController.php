@@ -22,7 +22,8 @@ class QuotesController extends Controller
                 ->paginate(20, [
                     'quotes.*',
                     'request_supplier.name as request_name',
-                    'request_supplier.src as request_src'
+                    'request_supplier.src as request_src',
+                    'request_supplier.quantity as request_quantity'
                 ]);
             foreach ($data as $item) {
                 $item->request_src = json_decode($item->request_src, true);
