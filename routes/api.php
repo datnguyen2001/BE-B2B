@@ -30,6 +30,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('banner', [HomeController::class, 'banner']);
 Route::get('trademark', [HomeController::class, 'trademark']);
 Route::get('category', [HomeController::class, 'category']);
+Route::get('category-product', [HomeController::class, 'categoryProduct']);
 Route::get('deal-hot-today', [ProductsController::class, 'dealHotToday']);
 Route::get('filter-deal-hot-today', [ProductsController::class, 'filterDealHotToday']);
 Route::get('filter-Product', [ProductsController::class, 'filterProduct']);

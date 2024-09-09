@@ -54,6 +54,20 @@ class HomeController extends Controller
         }
     }
 
+    public function categoryProduct()
+    {
+        try {
+            $data = DB::table('category as c')
+                ->where('c.display', 1)
+                ->select('c.id', 'c.name','c.name_en','c.slug','c.src')
+                ->get();
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
     public function getProductShop($id)
     {
         try {
