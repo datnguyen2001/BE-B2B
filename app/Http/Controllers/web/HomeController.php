@@ -58,8 +58,10 @@ class HomeController extends Controller
     {
         try {
             $data = DB::table('category as c')
+                ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
-                ->select('c.id', 'c.name','c.name_en','c.slug','c.src')
+                ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->groupBy('c.id', 'c.name','c.name_en','c.slug','c.src')
                 ->get();
 
             return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
