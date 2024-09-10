@@ -63,7 +63,7 @@ class QuotesController extends Controller
         try{
             $data = QuotesModel::join('request_supplier', 'quotes.request_supplier_id', '=', 'request_supplier.id')
                 ->where('quotes.id', $id)
-                ->select('quotes.*', 'request_supplier.name as request_name')
+                ->select('quotes.*', 'request_supplier.name as request_name','request_supplier.quantity as request_quantity','request_supplier.src as request_src')
                 ->first();
 
             return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
