@@ -16,8 +16,10 @@ class RequestSupplierController extends Controller
 {
     public function getRequestSupplier(){
         try{
+            $currentDate = now();
             $data = RequestSupplierModel::where('request_supplier.display', 1)
                 ->where('request_supplier.status', 1)
+                ->where('request_supplier.date_end', '>', $currentDate)
                 ->leftJoin('province', 'request_supplier.scope', '=', 'province.province_id')
                 ->select(
                     'request_supplier.*',
