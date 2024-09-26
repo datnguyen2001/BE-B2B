@@ -13,4 +13,9 @@ class ProvinceModel extends Model
         'province_id',
         'name'
     ];
+
+    public function province()
+    {
+        return $this->belongsTo(ProvinceModel::class, 'province_id');
+    }
 }

@@ -100,7 +100,8 @@ class RequestSupplierController extends Controller
         try{
             $data = RequestSupplierModel::find($id);
             $data->src = json_decode($data->src, true);
-            $user = User::find($data->user_id);
+            $user = User::with('province', 'district', 'ward')->find($data->user_id);
+
             $response = [
                 'request' => $data,
                 'user' => $user,

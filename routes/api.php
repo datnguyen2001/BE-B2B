@@ -40,6 +40,7 @@ Route::get('get-product-shop/{id}', [HomeController::class, 'getProductShop']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
 Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
+Route::get('edit-request-supplier-user/{id}', [RequestSupplierController::class, 'editRequestSupplierUser']);
 
 Route::get('province', [AddressController::class, 'province']);
 Route::get('district/{province_id}', [AddressController::class, 'district']);
@@ -79,7 +80,6 @@ Route::middleware(['jwt.auth'])->group(function () {
 
     Route::get('get-request-supplier-user', [RequestSupplierController::class, 'getRequestSupplierUser']);
     Route::post('create-request-supplier', [RequestSupplierController::class, 'createRequestSupplier']);
-    Route::get('edit-request-supplier-user/{id}', [RequestSupplierController::class, 'editRequestSupplierUser']);
     Route::post('update-request-supplier/{id}', [RequestSupplierController::class, 'updateRequestSupplier']);
     Route::post('update-request-display/{id}', [RequestSupplierController::class, 'updateRequestDisplay']);
     Route::get('delete-request/{id}', [RequestSupplierController::class, 'deleteRequest']);
