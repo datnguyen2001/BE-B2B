@@ -11,6 +11,7 @@ class AskToBuyModel extends Model
     protected $table='ask_to_buy';
     protected $fillable=[
         'user_id',
+        'shop_id',
         'product_id',
         'quantity',
         'content'

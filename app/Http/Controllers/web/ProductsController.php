@@ -696,6 +696,7 @@ class ProductsController extends Controller
             $user = JWTAuth::user();
             $ask = new AskToBuyModel();
             $ask->user_id = $user->id;
+            $ask->shop_id = $request->shop_id;
             $ask->product_id = $request->get('product_id');
             $ask->quantity = $request->get('quantity');
             $ask->content = $request->get('content');
