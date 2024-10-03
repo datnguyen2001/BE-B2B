@@ -344,6 +344,16 @@ class ShopController extends Controller
             if ($request->has('quantity')) {
                 $product->quantity = $request->get('quantity');
             }
+            $imagesToDelete = json_decode($product->src, true) ?? [];
+            if (count($imagesToDelete)>0){
+                foreach ($imagesToDelete as $image) {
+                    $filePath = str_replace('/storage', 'public', $image);
+                    Storage::delete($filePath);
+                }
+            }
+            $product->src = null;
+            $product->save();
+
             $existingSrc = json_decode($product->src, true) ?? [];
             $newSrcArray = [];
             if ($request->hasFile('src')) {
@@ -355,6 +365,8 @@ class ShopController extends Controller
                 $product->src = json_encode($finalSrcArray);
             }
             $product->save();
+
+            $dataAttribute = ProductsAttributeModel::where('product_id',$id)->delete();
 
             $attributes = json_decode($request->get('attributes'), true);
             if (is_array($attributes)) {
