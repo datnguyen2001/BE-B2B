@@ -209,19 +209,16 @@ class ShopController extends Controller
             $shop = ShopModel::where('user_id', $user->id)->first();
             $data = DB::table('products as p')
                 ->join(DB::raw("
-                (SELECT product_id, quantity, price
+                (SELECT product_id, MIN(quantity) as quantity, MIN(price) as price
                 FROM products_attribute
-                WHERE (product_id, quantity) IN (
-                    SELECT product_id, MIN(quantity)
-                    FROM products_attribute
-                    GROUP BY product_id
-                )) pa
+                GROUP BY product_id
+                ) pa
             "), 'p.id', '=', 'pa.product_id')
                 ->leftJoin('product_discounts as pd', function($join) {
                     $join->on('p.id', '=', 'pd.product_id')
                         ->whereDate('pd.date_start', '<=', now())
                         ->whereDate('pd.date_end', '>=', now())
-                        ->where('pd.number', '>', 0);;
+                        ->where('pd.number', '>', 0);
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
@@ -240,10 +237,26 @@ class ShopController extends Controller
                     'p.status',
                     'p.src',
                     'p.minimum_quantity as min_quantity',
-                    'pa.price as original_price',
-                    DB::raw('IFNULL(pd.discount, 0) as discount'),
-                    DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price'),
+                    DB::raw('MIN(pa.price) as original_price'), // Aggregated price
+                    DB::raw('IFNULL(MAX(pd.discount), 0) as discount'), // Use MAX() to aggregate discount
+                    DB::raw('ROUND(IF(MAX(pd.discount) IS NOT NULL, MIN(pa.price) - (MIN(pa.price) * MAX(pd.discount) / 100), MIN(pa.price)),0) as final_price'), // Consistent use of MIN() and MAX()
                     DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                )
+                ->groupBy(
+                    'p.id',
+                    'p.name',
+                    'p.name_en',
+                    'p.slug',
+                    'p.sku',
+                    'p.category_id',
+                    'p.unit',
+                    'p.en_unit',
+                    'p.quantity',
+                    'p.display',
+                    'p.status',
+                    'p.src',
+                    'p.minimum_quantity',
+                    'pr.name'
                 )
                 ->paginate(20);
             foreach ($data as $item) {
