@@ -460,7 +460,7 @@ class ShopController extends Controller
     public function detailProductShop($id)
     {
         try {
-            $product = ProductsModel::find($id);
+            $product = ProductsModel::with('category')->find($id);
             $product->src = json_decode($product->src, true);
             $product_attribute = ProductsAttributeModel::where('product_id',$id)->get();
             $discounts = ProductDiscountsModel::where('product_id', $id)->first();
