@@ -410,7 +410,7 @@ class ProductsController extends Controller
                 $viewItemProduct[] = $product->id;
                 array_unshift($viewItemProduct, $product->id);
                 $cartItemsJson = json_encode($viewItemProduct);
-                Cookie::queue('viewItemProduct', $cartItemsJson, 60 * 24 * 30);
+                Cookie::queue('viewItemProduct', $cartItemsJson, 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
             }
 
             $products_viewed = DB::table('products as p')
@@ -629,11 +629,11 @@ class ProductsController extends Controller
 
         if (($key = array_search($productId, $favoriteProducts)) !== false) {
             unset($favoriteProducts[$key]);
-            Cookie::queue('favorite_products', json_encode(array_values($favoriteProducts)), 86400);
+            Cookie::queue('favorite_products', json_encode(array_values($favoriteProducts)), 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
             return response()->json(['message' => 'Bỏ yêu thích sản phẩm thành công', 'status' => true]);
         } else {
             $favoriteProducts[] = $productId;
-            Cookie::queue('favorite_products', json_encode($favoriteProducts), 86400);
+            Cookie::queue('favorite_products', json_encode($favoriteProducts), 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
             return response()->json(['message' => 'Thêm sản phẩm yêu thích thành công', 'status' => true]);
         }
     }
