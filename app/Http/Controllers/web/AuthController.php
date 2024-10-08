@@ -83,6 +83,17 @@ class AuthController extends Controller
         return response()->json(['message' => 'Đăng nhập thành công', 'data' => $user, 'status' => true]);
     }
 
+    public function getProfile()
+    {
+        try {
+            $user = JWTAuth::user();
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công', 'data'=>$user, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
     public function updateProfile(Request $request)
     {
         $user = JWTAuth::user();

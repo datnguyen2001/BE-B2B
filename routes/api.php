@@ -47,6 +47,7 @@ Route::get('district/{province_id}', [AddressController::class, 'district']);
 Route::get('wards/{district_id}', [AddressController::class, 'wards']);
 
 Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('get-profile', [AuthController::class, 'getProfile']);
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
     Route::post('follow-shop', [AuthController::class, 'followShop']);
     Route::post('unfollow-shop', [AuthController::class, 'unfollowShop']);
