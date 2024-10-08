@@ -69,7 +69,7 @@ class ProfileManagementController extends Controller
             ->join('shop as s', 'o.shop_id', '=', 's.id')
             ->where('o.user_id', $user->id)
             ->select('o.id', 'o.order_code', 'o.status', 'o.created_at', 'o.total_payment','s.name as shop_name')
-            ->groupBy('o.id', 'o.order_code','s.name');
+            ->groupBy('o.id', 'o.order_code','s.name','o.status','o.created_at', 'o.total_payment','shop_name');
 
         if ($keySearch) {
             $ordersQuery->where(function ($query) use ($keySearch) {
