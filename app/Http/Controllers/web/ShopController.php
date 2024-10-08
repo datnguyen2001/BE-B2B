@@ -357,15 +357,6 @@ class ShopController extends Controller
             if ($request->has('quantity')) {
                 $product->quantity = $request->get('quantity');
             }
-            $imagesToDelete = json_decode($product->src, true) ?? [];
-            if (count($imagesToDelete)>0){
-                foreach ($imagesToDelete as $image) {
-                    $filePath = str_replace('/storage', 'public', $image);
-                    Storage::delete($filePath);
-                }
-            }
-            $product->src = null;
-            $product->save();
 
             $existingSrc = json_decode($product->src, true) ?? [];
             $newSrcArray = [];

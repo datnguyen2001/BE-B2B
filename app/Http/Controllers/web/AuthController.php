@@ -108,7 +108,7 @@ class AuthController extends Controller
             $user->phone = $request->get('phone');
         }
         if ($request->has('email')) {
-            $email = User::where('email',$request->get('email'))->first();
+            $email = User::where('email',$request->get('email'))->where('id','!=',$user->id)->first();
             if ($email){
                 return response()->json(['message' => 'Email đã tồn tại', 'status' => false]);
             }
