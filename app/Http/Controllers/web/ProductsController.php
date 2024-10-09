@@ -407,7 +407,7 @@ class ProductsController extends Controller
             $viewItemsJson = Cookie::has('viewItemProduct') ? Cookie::get('viewItemProduct') : '[]';
             $viewItemProduct = json_decode($viewItemsJson, true);
             if (!in_array($product->id, $viewItemProduct)) {
-                $viewItemProduct[] = $product->id;
+//                $viewItemProduct[] = $product->id;
                 array_unshift($viewItemProduct, $product->id);
                 $cartItemsJson = json_encode($viewItemProduct);
                 Cookie::queue('viewItemProduct', $cartItemsJson, 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');

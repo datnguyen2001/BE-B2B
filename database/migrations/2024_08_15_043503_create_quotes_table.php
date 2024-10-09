@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->integer('request_supplier_id');
+            $table->integer('user_id');
             $table->string('name');
             $table->string('phone');
             $table->string('price');

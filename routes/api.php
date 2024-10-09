@@ -88,6 +88,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-quotes', [QuotesController::class, 'getQuotes']);
     Route::post('create-quotes', [QuotesController::class, 'createQuotes']);
     Route::get('detail-quotes/{id}', [QuotesController::class, 'detailQuotes']);
+    Route::get('get-quotes-user', [QuotesController::class, 'getQuotesUser']);
 
     Route::get('get-delivery-address', [DeliveryAddressController::class, 'getDeliveryAddress']);
     Route::post('create-delivery-address', [DeliveryAddressController::class, 'createDeliveryAddress']);

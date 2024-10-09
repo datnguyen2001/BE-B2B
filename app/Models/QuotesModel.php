@@ -11,6 +11,7 @@ class QuotesModel extends Model
     protected $table='quotes';
     protected $fillable=[
         'request_supplier_id',
+        'user_id',
         'name',
         'phone',
         'price',

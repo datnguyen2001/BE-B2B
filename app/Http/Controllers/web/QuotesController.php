@@ -42,9 +42,11 @@ class QuotesController extends Controller
             $translator = new GoogleTranslate();
             $translator->setSource('vi');
             $translator->setTarget('en');
+            $user = JWTAuth::user();
             $translatedContent = $translator->translate($request->get('content'));
             $data = new QuotesModel();
             $data->request_supplier_id = $request->get('request_supplier_id');
+            $data->user_id = $user->id;
             $data->name = $request->get('name');
             $data->content = $request->get('content');
             $data->content_en = $translatedContent;
@@ -67,6 +69,31 @@ class QuotesController extends Controller
                 ->first();
 
             return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
+        }catch (\Exception $e){
+            return response()->json(['message'=>$e->getMessage(),'status'=>false]);
+        }
+    }
+
+    public function getQuotesUser(){
+        try{
+            $user = JWTAuth::user();
+            $data = QuotesModel::join('request_supplier', 'quotes.request_supplier_id', '=', 'request_supplier.id')
+                ->where('quotes.user_id', $user->id)
+                ->where('request_supplier.display', 1)
+                ->where('request_supplier.status', 1)
+                ->orderBy('quotes.created_at', 'desc')
+                ->paginate(20, [
+                    'quotes.*',
+                    'request_supplier.name as request_name',
+                    'request_supplier.src as request_src',
+                    'request_supplier.quantity as request_quantity'
+                ]);
+            foreach ($data as $item) {
+                $item->request_src = json_decode($item->request_src, true);
+            }
+
+            return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
+
         }catch (\Exception $e){
             return response()->json(['message'=>$e->getMessage(),'status'=>false]);
         }
