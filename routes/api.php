@@ -52,6 +52,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('follow-shop', [AuthController::class, 'followShop']);
     Route::post('unfollow-shop', [AuthController::class, 'unfollowShop']);
     Route::get('get-follow-shop', [AuthController::class, 'getFollowShop']);
+    Route::post('check-follow-shop', [AuthController::class, 'checkFollowShop']);
 
     Route::get('get-client', [ProfileManagementController::class, 'getClient']);
     Route::post('user-order', [ProfileManagementController::class, 'userOrder']);
