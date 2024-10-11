@@ -31,12 +31,6 @@ Route::get('banner', [HomeController::class, 'banner']);
 Route::get('trademark', [HomeController::class, 'trademark']);
 Route::get('category', [HomeController::class, 'category']);
 Route::get('category-product', [HomeController::class, 'categoryProduct']);
-Route::get('deal-hot-today', [ProductsController::class, 'dealHotToday']);
-Route::get('filter-deal-hot-today', [ProductsController::class, 'filterDealHotToday']);
-Route::get('filter-Product', [ProductsController::class, 'filterProduct']);
-Route::get('product-for-you', [ProductsController::class, 'productForYou']);
-Route::get('search-product', [ProductsController::class, 'searchProduct']);
-Route::get('get-product-shop/{id}', [HomeController::class, 'getProductShop']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
 Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);

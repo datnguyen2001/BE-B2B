@@ -211,6 +211,9 @@ class AuthController extends Controller
     {
         try {
             $user = JWTAuth::user();
+            if ($user){
+                return response()->json(['message' => 'Tài khoản chưa đăng nhập','data'=>false, 'status' => true]);
+            }
             $followShop = FollowShopsModel::where('user_id',$user->id)->where('shop_id',$request->get('shop_id'))->first();
             if ($followShop){
                 return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>true, 'status' => true]);

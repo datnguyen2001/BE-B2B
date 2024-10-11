@@ -22,6 +22,7 @@ class ProductsController extends Controller
     public function dealHotToday()
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $query = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT pa.product_id, pa.quantity, pa.price
@@ -67,6 +68,7 @@ class ProductsController extends Controller
 
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy sản phẩm deal hot hôm nay thành công', 'data' => $data, 'status' => true]);
@@ -79,6 +81,7 @@ class ProductsController extends Controller
     public function filterDealHotToday(Request $request)
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $categoryFilter = $request->input('category', null);
             $regionFilter = $request->input('region', null);
             $minPrice = $request->input('min_price', null);
@@ -144,6 +147,7 @@ class ProductsController extends Controller
 
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy sản phẩm deal hot hôm nay thành công', 'data' => $data, 'status' => true]);
@@ -156,6 +160,7 @@ class ProductsController extends Controller
     public function filterProduct(Request $request)
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $categoryFilter = $request->input('category', null);
             $regionFilter = $request->input('region', null);
             $minPrice = $request->input('min_price', null);
@@ -223,6 +228,7 @@ class ProductsController extends Controller
 
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy sản phẩm mới nhất thành công', 'data' => $data, 'status' => true]);
@@ -236,6 +242,7 @@ class ProductsController extends Controller
     public function productForYou()
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $query = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT pa.product_id, pa.quantity, pa.price
@@ -279,6 +286,7 @@ class ProductsController extends Controller
             $data = $query->paginate(20);
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy sản phẩm dành cho bạn thành công', 'data' => $data, 'status' => true]);
@@ -291,6 +299,7 @@ class ProductsController extends Controller
     public function searchProduct(Request $request)
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $searchTerm = $request->input('search', '');
             $query = DB::table('products as p')
                 ->join(DB::raw("
@@ -340,6 +349,7 @@ class ProductsController extends Controller
             $data = $query->paginate(20);
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Tìm kiếm sản phẩm thành công', 'data' => $data, 'status' => true]);
@@ -352,6 +362,7 @@ class ProductsController extends Controller
     public function detailProduct($slug)
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $product = DB::table('products')
                 ->join('shop', 'products.shop_id', '=', 'shop.id')
                 ->leftJoin('product_discounts', 'products.id', '=', 'product_discounts.product_id')
@@ -456,6 +467,7 @@ class ProductsController extends Controller
                     ->get();
             foreach ($products_viewed as $val){
                 $val->src = json_decode($val->src, true);
+                $val->is_favorite = in_array($val->id, $favoriteProducts) ? 1 : 0;
             }
 
             //Sản phẩm đề xuất từ của hàng
@@ -503,6 +515,7 @@ class ProductsController extends Controller
                 ->get();
             foreach ($products_recommended as $recommended){
                 $recommended->src = json_decode($recommended->src, true);
+                $recommended->is_favorite = in_array($recommended->id, $favoriteProducts) ? 1 : 0;
             }
 
             //Sản phẩm tương tự
@@ -550,6 +563,7 @@ class ProductsController extends Controller
                 ->get();
             foreach ($products_similar as $similar){
                 $similar->src = json_decode($similar->src, true);
+                $similar->is_favorite = in_array($similar->id, $favoriteProducts) ? 1 : 0;
             }
 
             $response = [
@@ -568,6 +582,7 @@ class ProductsController extends Controller
     public function getViewedProducts()
     {
         try {
+            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
             $viewItemsJson = Cookie::has('viewItemProduct') ? Cookie::get('viewItemProduct') : '[]';
             $viewItemProduct = json_decode($viewItemsJson, true);
 
@@ -613,6 +628,7 @@ class ProductsController extends Controller
                 ->paginate(16);
             foreach ($products_viewed as $val){
                 $val->src = json_decode($val->src, true);
+                $val->is_favorite = in_array($val->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $products_viewed , 'status' => true]);
@@ -685,6 +701,7 @@ class ProductsController extends Controller
             ->paginate(16);
         foreach ($products_viewed as $val){
             $val->src = json_decode($val->src, true);
+            $val->is_favorite = 1;
         }
 
         return response()->json(['message'=>'Lấy dữ liệu thành công','data' => $products_viewed, 'status' => true]);
