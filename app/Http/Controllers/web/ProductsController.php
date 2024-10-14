@@ -5,6 +5,7 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Models\AskToBuyModel;
 use App\Models\ProductDiscountsModel;
+use App\Models\ProductFavoritesModel;
 use App\Models\ProductReportModel;
 use App\Models\ProductsAttributeModel;
 use App\Models\ProductsModel;
@@ -19,10 +20,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductsController extends Controller
 {
-    public function dealHotToday()
+    public function dealHotToday(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id');
             $query = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT pa.product_id, pa.quantity, pa.price
@@ -640,16 +642,20 @@ class ProductsController extends Controller
     public function favoriteProduct(Request $request)
     {
         $productId = $request->get('product_id');
+        $user = JWTAuth::user();
 
-        $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+        $favorite = ProductFavoritesModel::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->first();
 
-        if (($key = array_search($productId, $favoriteProducts)) !== false) {
-            unset($favoriteProducts[$key]);
-            Cookie::queue('favorite_products', json_encode(array_values($favoriteProducts)), 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
+        if ($favorite) {
+            $favorite->delete();
             return response()->json(['message' => 'Bỏ yêu thích sản phẩm thành công', 'status' => true]);
         } else {
-            $favoriteProducts[] = $productId;
-            Cookie::queue('favorite_products', json_encode($favoriteProducts), 60 * 24 * 150, '/', env('SESSION_DOMAIN'), true, true, false, 'None');
+            ProductFavoritesModel::create([
+                'user_id' => $user->id,
+                'product_id' => $productId
+            ]);
             return response()->json(['message' => 'Thêm sản phẩm yêu thích thành công', 'status' => true]);
         }
     }
@@ -657,7 +663,8 @@ class ProductsController extends Controller
 
     public function getFavoriteProducts()
     {
-        $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+        $user = JWTAuth::user();
+        $favoriteProducts =  ProductFavoritesModel::where('user_id', $user->id)->pluck('product_id');
 
         $products_viewed = DB::table('products as p')
             ->join(DB::raw("

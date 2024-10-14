@@ -20,15 +20,6 @@ Route::get('/', [HomeController::class, 'home'])->name('home');
 
 Route::get('api/detail-product/{slug}', [ProductsController::class, 'detailProduct']);
 Route::get('api/get-viewed-products', [ProductsController::class, 'getViewedProducts']);
-Route::post('api/favorite-product', [ProductsController::class, 'favoriteProduct']);
-Route::get('api/get-favorite-product', [ProductsController::class, 'getFavoriteProducts']);
-
-Route::get('api/deal-hot-today', [ProductsController::class, 'dealHotToday']);
-Route::get('api/filter-deal-hot-today', [ProductsController::class, 'filterDealHotToday']);
-Route::get('api/filter-Product', [ProductsController::class, 'filterProduct']);
-Route::get('api/product-for-you', [ProductsController::class, 'productForYou']);
-Route::get('api/search-product', [ProductsController::class, 'searchProduct']);
-Route::get('api/get-product-shop/{id}', [HomeController::class, 'getProductShop']);
 
 Route::get('api/get-cart', [CartController::class, 'getCart']);
 Route::post('api/add-to-cart', [CartController::class, 'addToCart']);

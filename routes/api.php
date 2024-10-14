@@ -31,10 +31,17 @@ Route::get('banner', [HomeController::class, 'banner']);
 Route::get('trademark', [HomeController::class, 'trademark']);
 Route::get('category', [HomeController::class, 'category']);
 Route::get('category-product', [HomeController::class, 'categoryProduct']);
+Route::get('deal-hot-today', [ProductsController::class, 'dealHotToday']);
+Route::get('filter-deal-hot-today', [ProductsController::class, 'filterDealHotToday']);
+Route::get('filter-Product', [ProductsController::class, 'filterProduct']);
+Route::get('product-for-you', [ProductsController::class, 'productForYou']);
+Route::get('search-product', [ProductsController::class, 'searchProduct']);
+Route::get('get-product-shop/{id}', [HomeController::class, 'getProductShop']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
 Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
 Route::get('edit-request-supplier-user/{id}', [RequestSupplierController::class, 'editRequestSupplierUser']);
+Route::post('check-follow-shop', [AuthController::class, 'checkFollowShop']);
 
 Route::get('province', [AddressController::class, 'province']);
 Route::get('district/{province_id}', [AddressController::class, 'district']);
@@ -46,7 +53,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('follow-shop', [AuthController::class, 'followShop']);
     Route::post('unfollow-shop', [AuthController::class, 'unfollowShop']);
     Route::get('get-follow-shop', [AuthController::class, 'getFollowShop']);
-    Route::post('check-follow-shop', [AuthController::class, 'checkFollowShop']);
+    Route::post('favorite-product', [ProductsController::class, 'favoriteProduct']);
+    Route::get('get-favorite-product', [ProductsController::class, 'getFavoriteProducts']);
 
     Route::get('get-client', [ProfileManagementController::class, 'getClient']);
     Route::post('user-order', [ProfileManagementController::class, 'userOrder']);
