@@ -4,18 +4,11 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use App\Models\AskToBuyModel;
-use App\Models\ProductDiscountsModel;
 use App\Models\ProductFavoritesModel;
 use App\Models\ProductReportModel;
-use App\Models\ProductsAttributeModel;
-use App\Models\ProductsModel;
-use App\Models\ShopModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductsController extends Controller

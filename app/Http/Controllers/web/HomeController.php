@@ -4,7 +4,8 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use App\Models\BannerModel;
-use App\Models\CategoryModel;
+use Illuminate\Http\Request;
+use App\Models\ProductFavoritesModel;
 use App\Models\ShopModel;
 use App\Models\TrademarkModel;
 use Illuminate\Support\Facades\DB;
@@ -70,13 +71,15 @@ class HomeController extends Controller
         }
     }
 
-    public function getProductShop($id)
+    public function getProductShop(Request $request,$id)
     {
         try {
             $shop = ShopModel::find($id);
             if (!$shop){
                 return response()->json(['message' => 'Shop không tồn tại', 'status' => false]);
             }
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $data = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT product_id, quantity, price
@@ -118,6 +121,7 @@ class HomeController extends Controller
                 ->paginate(20);
             foreach ($data as $item) {
                 $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
             }
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
