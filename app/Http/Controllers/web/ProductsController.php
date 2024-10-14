@@ -24,7 +24,7 @@ class ProductsController extends Controller
     {
         try {
             $user_id = $request->get('user_id');
-            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $query = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT pa.product_id, pa.quantity, pa.price
@@ -83,7 +83,8 @@ class ProductsController extends Controller
     public function filterDealHotToday(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $categoryFilter = $request->input('category', null);
             $regionFilter = $request->input('region', null);
             $minPrice = $request->input('min_price', null);
@@ -162,7 +163,8 @@ class ProductsController extends Controller
     public function filterProduct(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $categoryFilter = $request->input('category', null);
             $regionFilter = $request->input('region', null);
             $minPrice = $request->input('min_price', null);
@@ -241,10 +243,11 @@ class ProductsController extends Controller
     }
 
 
-    public function productForYou()
+    public function productForYou(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $query = DB::table('products as p')
                 ->join(DB::raw("
                 (SELECT pa.product_id, pa.quantity, pa.price
@@ -301,7 +304,8 @@ class ProductsController extends Controller
     public function searchProduct(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $searchTerm = $request->input('search', '');
             $query = DB::table('products as p')
                 ->join(DB::raw("
@@ -361,10 +365,11 @@ class ProductsController extends Controller
         }
     }
 
-    public function detailProduct($slug)
+    public function detailProduct(Request $request,$slug)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $product = DB::table('products')
                 ->join('shop', 'products.shop_id', '=', 'shop.id')
                 ->leftJoin('product_discounts', 'products.id', '=', 'product_discounts.product_id')
@@ -581,10 +586,11 @@ class ProductsController extends Controller
         }
     }
 
-    public function getViewedProducts()
+    public function getViewedProducts(Request $request)
     {
         try {
-            $favoriteProducts = json_decode(Cookie::get('favorite_products'), true) ?? [];
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
             $viewItemsJson = Cookie::has('viewItemProduct') ? Cookie::get('viewItemProduct') : '[]';
             $viewItemProduct = json_decode($viewItemsJson, true);
 
@@ -664,7 +670,7 @@ class ProductsController extends Controller
     public function getFavoriteProducts()
     {
         $user = JWTAuth::user();
-        $favoriteProducts =  ProductFavoritesModel::where('user_id', $user->id)->pluck('product_id');
+        $favoriteProducts =  ProductFavoritesModel::where('user_id', $user->id)->pluck('product_id')->toArray();
 
         $products_viewed = DB::table('products as p')
             ->join(DB::raw("
