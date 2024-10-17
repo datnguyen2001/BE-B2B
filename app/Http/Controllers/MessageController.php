@@ -56,6 +56,6 @@ class MessageController extends Controller
             ->orWhere('user2_id', $user->id)
             ->get();
 
-        return response()->json($conversations);
+        return response()->json(['data' => $conversations, 'status' => true]);
     }
 }
