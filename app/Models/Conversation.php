@@ -16,4 +16,9 @@ class Conversation extends Model
         return $this->hasOne(Message::class)
             ->latestOfMany();
     }
+
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'user2_id');
+    }
 }
