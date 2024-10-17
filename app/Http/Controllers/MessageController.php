@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MessageController extends Controller
 {
@@ -43,5 +45,17 @@ class MessageController extends Controller
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json($message, 201);
+    }
+
+    public function getAllConversations()
+    {
+        $user = JWTAuth::user();
+
+        $conversations = Conversation::with('lastMessage')
+        ->where('sender_id', $user->id)
+            ->orWhere('receiver_id', $user->id)
+            ->get();
+
+        return response()->json($conversations);
     }
 }

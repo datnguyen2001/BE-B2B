@@ -10,4 +10,9 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = ['sender_id', 'receiver_id', 'content'];
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 }
