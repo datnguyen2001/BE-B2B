@@ -59,12 +59,12 @@ class MessageController extends Controller
         $user = JWTAuth::user();
 
         $conversations = Conversation::with(['lastMessage' => function ($query) {
-            $query->select('id', 'content', 'created_at', 'conversation_id');
+            $query->select('messages.id', 'messages.content', 'messages.created_at', 'messages.conversation_id');
         }, 'receiver' => function ($query) {
-            $query->select('id', 'name');
+            $query->select('users.id', 'users.name');
         }])
-            ->where('user1_id', $user->id)
-            ->orWhere('user2_id', $user->id)
+            ->where('conversations.user1_id', $user->id)
+            ->orWhere('conversations.user2_id', $user->id)
             ->get();
 
         $conversations = $conversations->map(function ($conversation) {

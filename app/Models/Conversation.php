@@ -14,6 +14,7 @@ class Conversation extends Model
     public function lastMessage()
     {
         return $this->hasOne(Message::class)
+            ->select('messages.id', 'messages.content', 'messages.created_at', 'messages.conversation_id')
             ->latestOfMany();
     }
 
