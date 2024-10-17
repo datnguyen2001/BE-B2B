@@ -52,8 +52,8 @@ class MessageController extends Controller
         $user = JWTAuth::user();
 
         $conversations = Conversation::with('lastMessage')
-        ->where('sender_id', $user->id)
-            ->orWhere('receiver_id', $user->id)
+            ->where('user1_id', $user->id)
+            ->orWhere('user2_id', $user->id)
             ->get();
 
         return response()->json($conversations);
