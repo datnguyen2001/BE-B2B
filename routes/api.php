@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\web\AuthController;
 use \App\Http\Controllers\web\HomeController;
@@ -101,4 +102,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('select-default-address/{id}', [DeliveryAddressController::class, 'selectDefaultAddress']);
 
     Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::get('/messages/{userId}/{receiverId}', [MessageController::class, 'index']);
 });
