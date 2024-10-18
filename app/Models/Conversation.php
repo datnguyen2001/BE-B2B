@@ -11,15 +11,20 @@ class Conversation extends Model
 
     protected $fillable = ['user1_id', 'user2_id'];
 
-    public function lastMessage()
+    public function user1()
     {
-        return $this->hasOne(Message::class)
-            ->select('messages.id', 'messages.content', 'messages.created_at', 'messages.conversation_id')
-            ->latestOfMany();
+        return $this->belongsTo(User::class, 'user1_id');
     }
-
-    public function receiver()
+    public function user2()
     {
         return $this->belongsTo(User::class, 'user2_id');
+    }
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class, 'conversation_id')->latestOfMany();
+    }
+    public function receiver()
+    {
+        return $this->user1_id === auth()->id() ? $this->user2() : $this->user1();
     }
 }

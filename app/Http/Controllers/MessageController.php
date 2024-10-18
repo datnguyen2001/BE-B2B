@@ -57,35 +57,47 @@ class MessageController extends Controller
     public function getAllConversations()
     {
         $user = JWTAuth::user();
+        $userId = $user->id;
 
         $conversations = Conversation::with(['lastMessage' => function ($query) {
             $query->select('messages.id', 'messages.content', 'messages.created_at', 'messages.conversation_id');
-        }, 'receiver' => function ($query) {
-            $query->select('users.id', 'users.name');
+        }, 'user1' => function ($query) {
+            $query->select('id', 'name', 'avatar');
+        }, 'user2' => function ($query) {
+            $query->select('id', 'name', 'avatar');
         }])
-            ->where('conversations.user1_id', $user->id)
-            ->orWhere('conversations.user2_id', $user->id)
-            ->get();
+            ->where('conversations.user1_id', $userId)
+            ->orWhere('conversations.user2_id', $userId)
+            ->get()
+            ->sortByDesc(function ($conversation) {
+                return $conversation->lastMessage ? $conversation->lastMessage->created_at : null;
+            });
 
-        $conversations = $conversations->map(function ($conversation) {
+        $conversations = $conversations->map(function ($conversation) use ($userId) {
             $lastMessage = $conversation->lastMessage ? [
                 'content' => $conversation->lastMessage->content,
                 'created_at' => $conversation->lastMessage->created_at,
                 'conversation_id' => $conversation->lastMessage->conversation_id,
             ] : null;
 
-            // Set the receiver name based on user2
-            $receiverName = $conversation->receiver ? $conversation->receiver->name : null;
+            // Determine the receiver ID, name, and avatar
+            $isUser1 = $conversation->user1_id === $userId;
+            $receiver = $isUser1 ? $conversation->user2 : $conversation->user1;
+
+            $receiverId = $receiver ? $receiver->id : null;
+            $receiverName = $receiver ? $receiver->name : null;
+            $receiverAvatar = $receiver ? $receiver->avatar : null;
 
             return [
                 'id' => $conversation->id,
-                'user1_id' => $conversation->user1_id,
-                'user2_id' => $conversation->user2_id,
+                'user1_id' => $userId, // Always the logged-in user
+                'user2_id' => $receiverId, // The other user in the conversation
                 'last_message' => $lastMessage,
                 'receiver_name' => $receiverName,
+                'receiver_avatar' => $receiverAvatar, // Include the receiver's avatar
             ];
         });
 
-        return response()->json(['data' => $conversations, 'status' => true]);
+        return response()->json(['data' => $conversations->values(), 'status' => true]);
     }
 }
