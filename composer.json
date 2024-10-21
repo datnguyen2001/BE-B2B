@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.8",
         "stichoza/google-translate-php": "^5.2",
         "tymon/jwt-auth": "^2.1",
-        "yoeunes/toastr": "^2.3"
+        "yoeunes/toastr": "^2.3",
+      "ext-curl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
