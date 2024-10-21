@@ -45,9 +45,6 @@ class MessageController extends Controller
             'conversation_id' => $request->conversation_id
         ]);
 
-        // Broadcast the new message to the receiver
-        broadcast(new MessageSent($message))->toOthers();
-
         return response()->json([
             'message' => $message,
             'status' => true,
