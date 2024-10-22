@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -18,5 +19,8 @@ use Illuminate\Support\Facades\Broadcast;
 //});
 
 Broadcast::channel('private-chat.{sender_id}-{receiver_id}', function ($user, $sender_id, $receiver_id) {
-    return in_array($user->id, [$sender_id, $receiver_id]);
+    if (in_array($user->id, [$sender_id, $receiver_id])) {
+        return new PrivateChannel('private-chat.' . min($sender_id, $receiver_id) . '-' . max($sender_id, $receiver_id));
+    }
+    return false;
 });
