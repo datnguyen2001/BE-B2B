@@ -31,7 +31,9 @@ class PusherController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => $request->get('message'),
+            'sender_id' => $request->get('sender_id'),
+            'receiver_id' => $request->get('receiver_id'),
+            'content' => $request->get('content'),
         ], 200);
     }
 }
