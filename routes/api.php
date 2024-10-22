@@ -60,6 +60,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('user-order', [ProfileManagementController::class, 'userOrder']);
     Route::post('user-order-cancel', [ProfileManagementController::class, 'userOrderCancel']);
     Route::get('detail-user-order/{id}', [ProfileManagementController::class, 'detailUserOrder']);
+    Route::get('statistical', [ProfileManagementController::class, 'statistical']);
 
     Route::post('shop-order', [ProfileManagementController::class, 'shopOrder']);
     Route::post('shop-order-status', [ProfileManagementController::class, 'shopOrderStatus']);

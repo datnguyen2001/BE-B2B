@@ -68,3 +68,5 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 1. composer require tymon/jwt-auth
 2. php artisan jwt:secret
 3. composer require stichoza/google-translate-php
+4. composer require google/apiclient
+

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Models\OrdersModel;
 use App\Models\ShopModel;
+use Carbon\Carbon;
+use Google\Client;
+use Google\Service\AnalyticsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -266,6 +269,91 @@ class ProfileManagementController extends Controller
             $order->save();
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công', 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function statistical()
+    {
+        try {
+            $user = JWTAuth::user();
+            $shop = ShopModel::where('user_id', $user->id)->first();
+
+            // Thống kê số đơn hàng theo trạng thái
+            $orders = DB::table('orders')
+                ->select(
+                    DB::raw('COUNT(CASE WHEN status = 0 THEN 1 END) as pending_orders'),
+                    DB::raw('COUNT(CASE WHEN status = 1 THEN 1 END) as awaiting_orders'),
+                    DB::raw('COUNT(CASE WHEN status = 3 THEN 1 END) as completed_orders'),
+                    DB::raw('COUNT(CASE WHEN status = 4 THEN 1 END) as cancels_orders')
+                )
+                ->where('shop_id', $shop->id)
+                ->first();
+
+            // Thống kê số sản phẩm hết hàng
+            $outOfStockProducts = DB::table('products')
+                ->where('shop_id', $shop->id)
+                ->where('quantity', '<=', 0)
+                ->where('status', '=', 1)
+                ->where('display', '=', 1)
+                ->count();
+
+            // Thống kê số đơn hàng theo ngày
+            $dailyOrders = DB::table('orders')
+                ->select(
+                    DB::raw('DATE(created_at) as order_date'),
+                    DB::raw('COUNT(*) as total_orders')
+                )
+                ->where('shop_id', $shop->id)
+                ->whereDate('created_at', '>=', Carbon::now()->subDays(7))
+                ->groupBy(DB::raw('DATE(created_at)'))
+                ->orderBy('order_date', 'desc')
+                ->get();
+
+            $client = new Client();
+            $client->setAuthConfig(storage_path('app/google/b2b-ga4.json'));
+            $client->addScope(AnalyticsData::ANALYTICS_READONLY);
+
+            $analytics = new AnalyticsData($client);
+            $propertyId = 'properties/463728937';
+
+            // Truy xuất dữ liệu
+            $request = new AnalyticsData\RunReportRequest([
+                'dateRanges' => [['startDate' => '30daysAgo', 'endDate' => 'today']],
+                'dimensions' => [['name' => 'date'], ['name' => 'pagePath']],
+                'metrics' => [['name' => 'screenPageViews']],
+                'dimensionFilter' => [
+                    'filter' => [
+                        'fieldName' => 'pagePath',
+                        'stringFilter' => [
+                            'matchType' => 'EXACT',
+                            'value' => '/'
+                        ]
+                    ]
+                ]
+            ]);
+            $response = $analytics->properties->runReport($propertyId, $request);
+
+            $ga4Data = [];
+            foreach ($response->getRows() as $row) {
+                $ga4Data[] = [
+                    'date' => $row->getDimensionValues()[0]->getValue(),
+                    'pagePath' => $row->getDimensionValues()[1]->getValue(),
+                    'screenPageViews' => $row->getMetricValues()[0]->getValue()
+                ];
+            }
+
+            return response()->json([
+                'message' => 'Lấy danh sách thống kê thành công.',
+                'data' => [
+                    'orders' => $orders,
+                    'daily_orders' => $dailyOrders,
+                    'out_of_stock_products' => $outOfStockProducts,
+                     'ga4' => $ga4Data
+                ],
+                'status' => true
+            ]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }

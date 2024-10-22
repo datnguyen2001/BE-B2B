@@ -5,28 +5,28 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
-                        <div class="card-body d-flex align-items-center flex-wrap"
+                        <div class="card-body d-flex align-items-center flex-wrap gap-3"
                              style="padding-top: 20px">
                             <a href="{{url('admin/order/index/all')}}" type="button"
                                class="btn btn-outline-secondary mb @if($status == 'all') active @endif"> Tất cả đơn hàng
                                 <span style="font-weight: 700">{{$order_all}}</span></a>
                             <a href="{{url('admin/order/index/0')}}"
-                               class="btn btn-outline-warning mx-3 @if($status == 0) active @endif">Chờ xác nhận <span
+                               class="btn btn-outline-warning @if($status == 0) active @endif">Chờ xác nhận <span
                                     style="font-weight: 700">{{$order_pending}}</span></a>
                             <a href="{{url('admin/order/index/1')}}" type="button"
                                class="btn btn-outline-info @if($status == 1) active @endif">Chờ lấy hàng <span
                                     style="font-weight: 700">{{$order_confirm}}</span></a>
                             <a href="{{url('admin/order/index/2')}}" type="button"
-                               class="btn btn-outline-primary mx-3 @if($status == 2) active @endif">Đang vận chuyển <span
+                               class="btn btn-outline-primary @if($status == 2) active @endif">Đang vận chuyển <span
                                     style="font-weight: 700">{{$order_delivery}}</span></a>
                             <a href="{{url('admin/order/index/3')}}" type="button"
                                class="btn btn-outline-success @if($status == 3) active @endif">Đơn hàng hoàn thành <span
                                     style="font-weight: 700">{{$order_complete}}</span></a>
                             <a href="{{url('admin/order/index/4')}}" type="button"
-                               class="btn btn-outline-danger mx-3 @if($status == 4) active @endif">Đơn huỷ <span
+                               class="btn btn-outline-danger  @if($status == 4) active @endif">Đơn huỷ <span
                                     style="font-weight: 700">{{$order_cancel}}</span></a>
                             <a href="{{url('admin/order/index/5')}}" type="button"
-                               class="btn btn-outline-danger mt-3 @if($status == 5) active @endif">Trả hàng hoàn tiền <span
+                               class="btn btn-outline-danger  @if($status == 5) active @endif">Trả hàng hoàn tiền <span
                                     style="font-weight: 700">{{$return_refund}}</span></a>
                         </div>
                     </div>
