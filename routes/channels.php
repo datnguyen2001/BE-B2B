@@ -17,6 +17,6 @@ use Illuminate\Support\Facades\Broadcast;
 //    return (int) $user->id === (int) $id;
 //});
 
-Broadcast::channel('chat.{receiverId}', function ($user, $receiverId) {
-    return (int) $user->id === (int) $receiverId;
+Broadcast::channel('private-chat.{sender_id}-{receiver_id}', function ($user, $sender_id, $receiver_id) {
+    return in_array($user->id, [$sender_id, $receiver_id]);
 });

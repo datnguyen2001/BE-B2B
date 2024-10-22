@@ -15,11 +15,14 @@ class PusherController extends Controller
     public function broadcast(Request $request)
     {
         $message = $request->get('message');
+        $sender_id = $request->get('sender_id');
+        $receiver_id = $request->get('receiver_id');
+
         if (is_array($message)) {
             $message = json_encode($message);
         }
 
-        broadcast(new PusherBroadcast($message))->toOthers();
+        broadcast(new PusherBroadcast($message, $sender_id, $receiver_id))->toOthers();
 
         return response()->json([
             'status' => true,
