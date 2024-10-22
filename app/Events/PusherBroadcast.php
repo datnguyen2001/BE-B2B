@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -31,11 +32,19 @@ class PusherBroadcast implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
+//    public function broadcastOn(): array
+//    {
+//        $channelName = 'private-chat.' . min($this->sender_id, $this->receiver_id) . '-' . max($this->sender_id, $this->receiver_id);
+//
+//        return [new PrivateChannel($channelName)];
+//    }
+
     public function broadcastOn(): array
     {
-        $channelName = 'private-chat.' . min($this->sender_id, $this->receiver_id) . '-' . max($this->sender_id, $this->receiver_id);
+        // Use public channel instead of private channel
+        $channelName = 'chat.' . min($this->sender_id, $this->receiver_id) . '-' . max($this->sender_id, $this->receiver_id);
 
-        return [new PrivateChannel($channelName)];
+        return [new Channel($channelName)];
     }
 
     public function broadcastAs(): string
