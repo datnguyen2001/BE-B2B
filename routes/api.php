@@ -109,6 +109,4 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/{userId}/{receiverId}', [MessageController::class, 'index']);
     Route::get('/conversations', [MessageController::class, 'getAllConversations']);
-
-
 });
