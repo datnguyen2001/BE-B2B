@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PusherController;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\web\AuthController;
 use \App\Http\Controllers\web\HomeController;
@@ -47,6 +49,8 @@ Route::get('province', [AddressController::class, 'province']);
 Route::get('district/{province_id}', [AddressController::class, 'district']);
 Route::get('wards/{district_id}', [AddressController::class, 'wards']);
 
+Route::post('test-chat/broadcast', [PusherController::class, 'broadcast'])->name('test-chat.broadcast');
+Route::post('test-chat/receive', [PusherController::class, 'receive'])->name('test-chat.receive');
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-profile', [AuthController::class, 'getProfile']);
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
@@ -102,4 +106,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('select-default-address/{id}', [DeliveryAddressController::class, 'selectDefaultAddress']);
 
     Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::get('/messages/{userId}/{receiverId}', [MessageController::class, 'index']);
+    Route::get('/conversations', [MessageController::class, 'getAllConversations']);
 });
