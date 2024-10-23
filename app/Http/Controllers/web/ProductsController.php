@@ -78,8 +78,14 @@ class ProductsController extends Controller
         try {
             $user_id = $request->get('user_id');
             $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
-            $categoryFilter = $request->input('category', null);
-            $regionFilter = $request->input('region', null);
+            $categoryFilter = $request->input('category', []);
+            $regionFilter = $request->input('region', []);
+            if (is_string($categoryFilter)) {
+                $categoryFilter = json_decode($categoryFilter, true);
+            }
+            if (is_string($regionFilter)) {
+                $regionFilter = json_decode($regionFilter, true);
+            }
             $minPrice = $request->input('min_price', null);
             $maxPrice = $request->input('max_price', null);
 
@@ -124,11 +130,11 @@ class ProductsController extends Controller
                 ->where('s.display', '=', 1)
                 ->orderByDesc(DB::raw('IF(pd.discount IS NOT NULL, pd.discount, 0)'));
             if ($categoryFilter) {
-                $query->where('p.category_id', $categoryFilter);
+                $query->whereIn('p.category_id', $categoryFilter);
             }
 
             if ($regionFilter) {
-                $query->where('s.scope', $regionFilter);
+                $query->whereIn('s.scope', $regionFilter);
             }
 
             if ($minPrice) {
@@ -158,8 +164,14 @@ class ProductsController extends Controller
         try {
             $user_id = $request->get('user_id');
             $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
-            $categoryFilter = $request->input('category', null);
-            $regionFilter = $request->input('region', null);
+            $categoryFilter = $request->input('category', []);
+            $regionFilter = $request->input('region', []);
+            if (is_string($categoryFilter)) {
+                $categoryFilter = json_decode($categoryFilter, true);
+            }
+            if (is_string($regionFilter)) {
+                $regionFilter = json_decode($regionFilter, true);
+            }
             $minPrice = $request->input('min_price', null);
             $maxPrice = $request->input('max_price', null);
 
@@ -206,11 +218,11 @@ class ProductsController extends Controller
                 ->orderBy('p.created_at', 'desc');
 
             if ($categoryFilter) {
-                $query->where('p.category_id', $categoryFilter);
+                $query->whereIn('p.category_id', $categoryFilter);
             }
 
             if ($regionFilter) {
-                $query->where('s.scope', $regionFilter);
+                $query->whereIn('s.scope', $regionFilter);
             }
 
             if ($minPrice) {
