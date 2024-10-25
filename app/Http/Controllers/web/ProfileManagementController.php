@@ -299,6 +299,14 @@ class ProfileManagementController extends Controller
                 ->where('display', '=', 1)
                 ->count();
 
+            // Thống kê số sản phẩm bị từ chối
+            $rejectedProducts = DB::table('products')
+                ->where('shop_id', $shop->id)
+                ->where('quantity', '<=', 0)
+                ->where('status', '=', 0)
+                ->where('display', '=', 1)
+                ->count();
+
             // Thống kê số đơn hàng theo ngày
             $dailyOrders = DB::table('orders')
                 ->select(
@@ -350,6 +358,7 @@ class ProfileManagementController extends Controller
                     'orders' => $orders,
                     'daily_orders' => $dailyOrders,
                     'out_of_stock_products' => $outOfStockProducts,
+                     'rejectedProducts'=>$rejectedProducts,
                      'ga4' => $ga4Data
                 ],
                 'status' => true
