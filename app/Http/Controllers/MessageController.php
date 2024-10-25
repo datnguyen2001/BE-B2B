@@ -85,13 +85,19 @@ class MessageController extends Controller
             $receiverName = $receiver ? $receiver->name : null;
             $receiverAvatar = $receiver ? $receiver->avatar : null;
 
+
+            $unreadMessageCount = Message::where('conversation_id', $conversation->id)
+                ->where('receiver_id', $userId)
+                ->where('is_read', false)
+                ->count();
             return [
                 'id' => $conversation->id,
-                'user1_id' => $userId, // Always the logged-in user
+                'user1_id' => $userId,
                 'user2_id' => $receiverId, // The other user in the conversation
                 'last_message' => $lastMessage,
                 'receiver_name' => $receiverName,
                 'receiver_avatar' => $receiverAvatar, // Include the receiver's avatar
+                'unread_message_count' => $unreadMessageCount,
             ];
         });
 
@@ -106,19 +112,5 @@ class MessageController extends Controller
             ->update(['is_read' => true]);
 
         return response()->json(['status' => true, 'message' => 'Messages marked as read.']);
-    }
-
-    public function countUnreadMessage()
-    {
-        $userId = JWTAuth::user()->id;
-        $unreadMessageCount = Message::where('receiver_id', $userId)
-            ->where('is_read', false)
-            ->count();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Lấy số lượng tin nhắn chưa đọc thành công',
-            'unread_count' => $unreadMessageCount,
-        ]);
     }
 }
