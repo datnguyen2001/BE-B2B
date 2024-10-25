@@ -107,4 +107,18 @@ class MessageController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Messages marked as read.']);
     }
+
+    public function countUnreadMessage()
+    {
+        $userId = JWTAuth::user()->id;
+        $unreadMessageCount = Message::where('receiver_id', $userId)
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy số lượng tin nhắn chưa đọc thành công',
+            'unread_count' => $unreadMessageCount,
+        ]);
+    }
 }
