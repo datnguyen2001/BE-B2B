@@ -97,4 +97,14 @@ class MessageController extends Controller
 
         return response()->json(['data' => $conversations->values(), 'status' => true]);
     }
+
+    public function markAsRead($userId, $conversationId)
+    {
+        Message::where('receiver_id', $userId)
+            ->where('conversation_id', $conversationId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json(['status' => true, 'message' => 'Messages marked as read.']);
+    }
 }
