@@ -258,7 +258,8 @@ class ShopController extends Controller
                     'p.status',
                     'p.src',
                     'p.minimum_quantity',
-                    'pr.name'
+                    'pr.name',
+                    'ask_count'
                 )
                 ->paginate(20);
             foreach ($data as $item) {
