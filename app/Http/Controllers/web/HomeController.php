@@ -4,6 +4,8 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use App\Models\BannerModel;
+use App\Models\FooterModel;
+use App\Models\SettingModel;
 use Illuminate\Http\Request;
 use App\Models\ProductFavoritesModel;
 use App\Models\ShopModel;
@@ -98,6 +100,7 @@ class HomeController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->where('p.shop_id', $shop->id)
                 ->where('p.display', 1)
                 ->where('p.status', 1)
@@ -116,7 +119,8 @@ class HomeController extends Controller
                     'pa.price as original_price',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price'),
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->paginate(20);
             foreach ($data as $item) {
@@ -126,6 +130,37 @@ class HomeController extends Controller
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
 
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function setting()
+    {
+        try {
+            $data = SettingModel::first();
+            $client_support = FooterModel::where('type',1)->get();
+            $about_us = FooterModel::where('type',2)->get();
+            $cooperation_association = FooterModel::where('type',3)->get();
+            $response = [
+                'setting'=>$data,
+                'client_support'=>$client_support,
+                'about_us'=>$about_us,
+                'cooperation_association'=>$cooperation_association
+            ];
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$response, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function detailPostFooter($slug)
+    {
+        try {
+            $data = FooterModel::where('slug',$slug)->first();
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }

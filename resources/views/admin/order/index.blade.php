@@ -75,8 +75,8 @@
                                                     {{$value->order_code}}<br>
                                                     <span
                                                         style="color: @if($value->status == 0) #FF9900 @elseif($value->status == 1) #0099FF @elseif($value->status == 2) #0066FF @elseif($value->status == 3) #00FF00 @elseif($value->status == 4) #FF3333 @endif; font-weight: 600">{{$value->status_name}}</span><br>
-                                                    <span> @if($value->type_payment == 1) Nhận hàng thanh toán @else
-                                                            Thanh toán qua VNPAY @endif</span>
+                                                    <span> @if($value->type_payment == 1) Thanh toán qua VNPAY @else
+                                                            Nhận hàng thanh toán @endif</span>
                                                     <br>{{$value->created_at}}
                                                 </a>
                                             </td>

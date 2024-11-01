@@ -36,6 +36,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -52,7 +53,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->where('p.display', '=', 1)
                 ->where('p.status', '=', 1)
@@ -107,6 +109,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -123,7 +126,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->where('p.display', '=', 1)
                 ->where('p.status', '=', 1)
@@ -193,6 +197,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -210,6 +215,7 @@ class ProductsController extends Controller
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
                     DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count'),
                     'p.created_at'
                 )
                 ->where('p.display', '=', 1)
@@ -247,7 +253,6 @@ class ProductsController extends Controller
         }
     }
 
-
     public function productForYou(Request $request)
     {
         try {
@@ -271,6 +276,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -287,11 +293,72 @@ class ProductsController extends Controller
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as price'),
                     'pa.price as price_original',
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )->where('p.display', '=', 1)
                 ->where('s.display', '=', 1)
                 ->where('p.status', '=', 1);
             $query->orderByRaw('RAND()');
+
+            $data = $query->paginate(20);
+            foreach ($data as $item) {
+                $item->src = json_decode($item->src, true);
+                $item->is_favorite = in_array($item->id, $favoriteProducts) ? 1 : 0;
+            }
+
+            return response()->json(['message' => 'Lấy sản phẩm dành cho bạn thành công', 'data' => $data, 'status' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function productNew(Request $request)
+    {
+        try {
+            $user_id = $request->get('user_id');
+            $favoriteProducts = ProductFavoritesModel::where('user_id',$user_id)->pluck('product_id')->toArray();
+            $query = DB::table('products as p')
+                ->join(DB::raw("
+                (SELECT pa.product_id, pa.quantity, pa.price
+                FROM products_attribute pa
+                WHERE (pa.product_id, pa.quantity) IN (
+                    SELECT pa2.product_id, MIN(pa2.quantity)
+                    FROM products_attribute pa2
+                    GROUP BY pa2.product_id
+                )) pa
+            "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function ($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0);
+                })
+                ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
+                ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
+                ->select(
+                    'p.id',
+                    'p.name',
+                    'p.name_en',
+                    'p.slug',
+                    'p.sku',
+                    'p.category_id',
+                    'p.unit',
+                    'p.en_unit',
+                    'p.quantity',
+                    'p.src',
+                    'p.minimum_quantity as min_quantity',
+                    DB::raw('IFNULL(pd.discount, 0) as discount'),
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as price'),
+                    'pa.price as price_original',
+                    's.name as shop_name',
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
+                )->where('p.display', '=', 1)
+                ->where('s.display', '=', 1)
+                ->where('p.status', '=', 1);
+            $query->orderBy('p.created_at','desc');
 
             $data = $query->paginate(20);
             foreach ($data as $item) {
@@ -330,6 +397,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -346,7 +414,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )->where('p.display', '=', 1)
                 ->where('s.display', '=', 1)
                 ->where('p.status', '=', 1);
@@ -382,6 +451,7 @@ class ProductsController extends Controller
                 ->leftJoin('district', 'shop.district_id', '=', 'district.district_id')
                 ->leftJoin('wards', 'shop.ward_id', '=', 'wards.wards_id')
                 ->leftJoin('category', 'products.category_id', '=', 'category.id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'products.id', '=', 'atb.product_id')
                 ->where('products.slug', $slug)
                 ->where('products.display', 1)
                 ->where('products.status', 1)
@@ -412,7 +482,9 @@ class ProductsController extends Controller
                     DB::raw('IFNULL(product_discounts.number, 0) as number_discount'),
                     DB::raw('IFNULL(product_discounts.discount, 0) as discount'),
                     DB::raw('(SELECT COUNT(*) FROM products WHERE shop_id = shop.id) as total_products_shop'),
-                    DB::raw('(SELECT COUNT(*) FROM follow_shops WHERE shop_id = shop.id) as total_followers_shop')
+                    DB::raw('(SELECT COUNT(*) FROM follow_shops WHERE shop_id = shop.id) as total_followers_shop'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count'),
+                    DB::raw('(SELECT COUNT(*) FROM conversations WHERE (user1_id = shop.user_id OR user2_id = shop.user_id)) as contact_count')
                 )
                 ->first();
             if (!$product) {
@@ -454,6 +526,7 @@ class ProductsController extends Controller
                     })
                     ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                     ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                     ->select(
                         'p.id',
                         'p.name',
@@ -469,7 +542,8 @@ class ProductsController extends Controller
                         'pa.price as price_original',
                         DB::raw('IFNULL(pd.discount, 0) as discount'),
                         's.name as shop_name',
-                        DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                        DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                        DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                     )
                     ->whereIn('p.id', $viewItemProduct)
                     ->where('p.display', '=', 1)
@@ -501,6 +575,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -516,7 +591,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->where('s.id', $product->shop_id)
                 ->where('p.display', '=', 1)
@@ -549,6 +625,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -564,7 +641,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->where('p.category_id', $product->category_id)
                 ->where('p.display', '=', 1)
@@ -617,6 +695,7 @@ class ProductsController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->select(
                     'p.id',
                     'p.name',
@@ -632,7 +711,8 @@ class ProductsController extends Controller
                     'pa.price as price_original',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     's.name as shop_name',
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->whereIn('p.id', $viewItemProduct)
                 ->where('p.display', '=', 1)
@@ -695,6 +775,7 @@ class ProductsController extends Controller
             })
             ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
             ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+            ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
             ->select(
                 'p.id',
                 'p.name',
@@ -710,7 +791,8 @@ class ProductsController extends Controller
                 'pa.price as price_original',
                 DB::raw('IFNULL(pd.discount, 0) as discount'),
                 's.name as shop_name',
-                DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
             )
             ->whereIn('p.id', $favoriteProducts)
             ->where('p.display', '=', 1)

@@ -89,7 +89,7 @@
                                 <label for="inputText" class="col-sm-3 col-form-label">Phương thức thanh toán:</label>
                                 <div class="col-sm-9">
                                     <input disabled type="text" name="type_payment" required class="form-control"
-                                           value="@if($listData->type_payment == 1) Nhận hàng thanh toán @else Thanh toán qua VNPAY @endif">
+                                           value="@if($listData->type_payment == 1) Thanh toán qua VNPAY @else Nhận hàng thanh toán @endif">
                                 </div>
                             </div>
                             <div class="row mb-3">

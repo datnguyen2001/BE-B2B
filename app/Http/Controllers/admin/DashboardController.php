@@ -39,7 +39,12 @@ class DashboardController extends Controller
             $province = ProvinceModel::where('province_id', $item->province_id)->first();
             $district = DistrictModel::where('district_id', $item->district_id)->first();
             $ward = WardsModel::where('wards_id', $item->ward_id)->first();
-            $item->full_address = $item->address_detail . ', ' . $ward->name . ', ' . $district->name . ', ' . $province->name;
+            if ($province&&$district&&$ward){
+                $item->full_address = $item->address_detail . ', ' . $ward->name . ', ' . $district->name . ', ' . $province->name;
+            }else{
+                $item->full_address = "Chưa cập nhật";
+            }
+
         }
 
         return view('admin.user.index', compact('titlePage','page_menu','page_sub','listData'));

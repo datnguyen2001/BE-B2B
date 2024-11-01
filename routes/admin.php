@@ -9,6 +9,8 @@ use \App\Http\Controllers\admin\CategoryController;
 use \App\Http\Controllers\admin\ProductController;
 use \App\Http\Controllers\admin\RequestSupplierController;
 use \App\Http\Controllers\admin\OrdersController;
+use \App\Http\Controllers\admin\SettingController;
+use \App\Http\Controllers\admin\FooterController;
 
 Route::get('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/dologin', [LoginController::class, 'doLogin'])->name('doLogin');
@@ -67,6 +69,20 @@ Route::middleware('check-admin-auth')->group(function () {
         Route::get('index/{status}', [OrdersController::class,'getDataOrder'])->name('index');
         Route::get('detail/{id}', [OrdersController::class,'orderDetail'])->name('detail');
         Route::get('status/{order_id}/{status_id}', [OrdersController::class,'statusOrder'])->name('status');
+    });
+
+    Route::prefix('setting')->name('setting.')->group(function () {
+        Route::get('', [SettingController::class, 'index'])->name('index');
+        Route::post('update', [SettingController::class, 'save'])->name('update');
+    });
+
+    Route::prefix('footer')->name('footer.')->group(function () {
+        Route::get('/', [FooterController::class, 'index'])->name('index');
+        Route::get('create', [FooterController::class, 'create'])->name('create');
+        Route::post('store', [FooterController::class, 'store'])->name('store');
+        Route::get('delete/{id}', [FooterController::class, 'delete']);
+        Route::get('edit/{id}', [FooterController::class, 'edit']);
+        Route::post('update/{id}', [FooterController::class, 'update']);
     });
 
 });

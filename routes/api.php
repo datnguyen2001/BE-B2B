@@ -34,11 +34,14 @@ Route::get('trademark', [HomeController::class, 'trademark']);
 Route::get('category', [HomeController::class, 'category']);
 Route::get('category-product', [HomeController::class, 'categoryProduct']);
 Route::get('deal-hot-today', [ProductsController::class, 'dealHotToday']);
+Route::get('product-new', [ProductsController::class, 'productNew']);
 Route::get('filter-deal-hot-today', [ProductsController::class, 'filterDealHotToday']);
 Route::get('filter-Product', [ProductsController::class, 'filterProduct']);
 Route::get('product-for-you', [ProductsController::class, 'productForYou']);
 Route::get('search-product', [ProductsController::class, 'searchProduct']);
 Route::get('get-product-shop/{id}', [HomeController::class, 'getProductShop']);
+Route::get('setting', [HomeController::class, 'setting']);
+Route::get('detail-post-footer/{slug}', [HomeController::class, 'detailPostFooter']);
 
 Route::get('detail-shop/{id}', [ShopController::class, 'detailShop']);
 Route::get('get-request-supplier', [RequestSupplierController::class, 'getRequestSupplier']);
@@ -59,6 +62,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-follow-shop', [AuthController::class, 'getFollowShop']);
     Route::post('favorite-product', [ProductsController::class, 'favoriteProduct']);
     Route::get('get-favorite-product', [ProductsController::class, 'getFavoriteProducts']);
+    Route::get('check-shop', [AuthController::class, 'checkShop']);
 
     Route::get('get-client', [ProfileManagementController::class, 'getClient']);
     Route::post('user-order', [ProfileManagementController::class, 'userOrder']);
@@ -79,6 +83,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-product', [ShopController::class, 'getProduct']);
     Route::post('create-product', [ShopController::class, 'createProduct']);
     Route::post('update-product/{id}', [ShopController::class, 'updateProduct']);
+    Route::post('update-quantity-product/{id}', [ShopController::class, 'updateQuantityProduct']);
     Route::get('delete-product/{id}', [ShopController::class, 'deleteProduct']);
     Route::get('delete-product-attribute/{id}', [ShopController::class, 'deleteProductAttribute']);
     Route::post('delete-product-image/{id}', [ShopController::class, 'deleteProductImage']);

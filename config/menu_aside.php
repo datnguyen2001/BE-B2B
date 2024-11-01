@@ -97,5 +97,21 @@ return [
             'submenu' => [],
             'number' => 2
         ],
+        [
+            'name' => 'setting',
+            'title' => 'Cài đặt chung',
+            'icon' => 'bi bi-grid',
+            'route' => 'admin.setting.index',
+            'submenu' => [],
+            'number' => 2
+        ],
+        [
+            'name' => 'footer',
+            'title' => 'Bài viết footer',
+            'icon' => 'bi bi-grid',
+            'route' => 'admin.footer.index',
+            'submenu' => [],
+            'number' => 2
+        ],
 ]
 ];

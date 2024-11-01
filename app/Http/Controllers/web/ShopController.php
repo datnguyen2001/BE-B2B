@@ -222,6 +222,7 @@ class ShopController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->where('p.shop_id', $shop->id)
                 ->select(
                     'p.id',
@@ -240,7 +241,8 @@ class ShopController extends Controller
                     DB::raw('MIN(pa.price) as original_price'), // Aggregated price
                     DB::raw('IFNULL(MAX(pd.discount), 0) as discount'), // Use MAX() to aggregate discount
                     DB::raw('ROUND(IF(MAX(pd.discount) IS NOT NULL, MIN(pa.price) - (MIN(pa.price) * MAX(pd.discount) / 100), MIN(pa.price)),0) as final_price'), // Consistent use of MIN() and MAX()
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 )
                 ->groupBy(
                     'p.id',
@@ -370,7 +372,7 @@ class ShopController extends Controller
             }
             $product->save();
 
-            $dataAttribute = ProductsAttributeModel::where('product_id',$id)->delete();
+           ProductsAttributeModel::where('product_id',$id)->delete();
 
             $attributes = json_decode($request->get('attributes'), true);
             if (is_array($attributes)) {
@@ -392,6 +394,19 @@ class ShopController extends Controller
             }
 
             return response()->json(['message' => 'Cập nhật sản phẩm thành công', 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function updateQuantityProduct(Request $request, $id)
+    {
+        try {
+            $product = ProductsModel::find($id);
+            $product->quantity = $request->get('quantity');
+            $product->save();
+
+            return response()->json(['message' => 'Cập nhật tồn kho thành công', 'status' => true]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }
@@ -545,6 +560,7 @@ class ShopController extends Controller
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
+                ->leftJoin(DB::raw("(SELECT product_id, COUNT(*) as ask_count FROM ask_to_buy GROUP BY product_id) as atb"), 'p.id', '=', 'atb.product_id')
                 ->where('p.shop_id', $shop->id)
                 ->select(
                     'p.id',
@@ -563,7 +579,8 @@ class ShopController extends Controller
                     'pa.price as original_price',
                     DB::raw('IFNULL(pd.discount, 0) as discount'),
                     DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price),0) as final_price'),
-                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name')
+                    DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
+                    DB::raw('IFNULL(atb.ask_count, 0) as ask_count')
                 );
 
             if ($searchTerm) {

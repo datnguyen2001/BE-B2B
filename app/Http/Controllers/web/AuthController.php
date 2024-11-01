@@ -5,6 +5,7 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Mail\VerificationCodes;
 use App\Models\FollowShopsModel;
+use App\Models\ShopModel;
 use App\Models\User;
 use App\Models\UserVerificationModel;
 use Illuminate\Http\Request;
@@ -215,6 +216,22 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>true, 'status' => true]);
             }else{
                 return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>false, 'status' => true]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function checkShop()
+    {
+        try {
+            $user = JWTAuth::user();
+            $followShop = ShopModel::find($user->id);
+            if ($followShop){
+                return response()->json(['message' => 'Theo dõi shop thành công','data'=>true, 'status' => true]);
+            }else{
+                return response()->json(['message' => 'Theo dõi shop thành công','data'=>false, 'status' => true]);
             }
 
         } catch (\Exception $e) {
