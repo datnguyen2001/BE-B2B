@@ -22,12 +22,16 @@ class ShopController extends Controller
                 ->join('province as p', 's.province_id', '=', 'p.province_id')
                 ->join('district as d', 's.district_id', '=', 'd.district_id')
                 ->join('wards as w', 's.ward_id', '=', 'w.wards_id')
+                ->leftJoin('follow_shops as fs', 's.id', '=', 'fs.shop_id')
                 ->where('s.id', $id)
                 ->select(
                     's.*',
                     DB::raw("CONCAT(s.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
-                    DB::raw("CONCAT( d.name, ', ', p.name) as sub_address")
+                    DB::raw("CONCAT( d.name, ', ', p.name) as sub_address"),
+                    DB::raw("COUNT(fs.id) as total_followers_shop"),
+                    DB::raw('(SELECT COUNT(*) FROM conversations WHERE (user1_id = s.user_id OR user2_id = s.user_id)) as total_contacts')
                 )
+                ->groupBy('s.id')
                 ->first();
             if ($data->display == 0){
                 return response()->json(['message'=>'Cửa hàng của bạn đã bị khóa','status'=>true]);

@@ -37,6 +37,9 @@ class DeliveryAddressController extends Controller
     {
         try {
             $user = JWTAuth::user();
+            $existingDefaultAddress = DeliveryAddressModel::where('user_id', $user->id)
+                ->where('display', 1)
+                ->exists();
             $data = new DeliveryAddressModel();
             $data->user_id = $user->id;
             $data->name = $request->get('name');
@@ -45,7 +48,7 @@ class DeliveryAddressController extends Controller
             $data->district_id = $request->get('district_id');
             $data->ward_id = $request->get('ward_id');
             $data->address_detail = $request->get('address_detail');
-            $data->display = 0;
+            $data->display = $existingDefaultAddress ? 0 : 1;
             $data->save();
 
             return response()->json(['message' => 'Tạo địa chỉ thành công', 'status' => true]);
