@@ -218,7 +218,8 @@ class ShopController extends Controller
                     $join->on('p.id', '=', 'pd.product_id')
                         ->whereDate('pd.date_start', '<=', now())
                         ->whereDate('pd.date_end', '>=', now())
-                        ->where('pd.number', '>', 0);
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
@@ -557,7 +558,8 @@ class ShopController extends Controller
                     $join->on('p.id', '=', 'pd.product_id')
                         ->whereDate('pd.date_start', '<=', now())
                         ->whereDate('pd.date_end', '>=', now())
-                        ->where('pd.number', '>', 0);;
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
@@ -599,6 +601,23 @@ class ShopController extends Controller
 
         }catch (\Exception $e){
             return response()->json(['message'=>$e->getMessage(),'status'=>false]);
+        }
+    }
+
+    public function setDisplayProductDiscount(Request $request, $id)
+    {
+        try {
+            $product = ProductsModel::find($id);
+            if (!$product) {
+                return response()->json(['message' => 'Sản phẩm không tồn tại', 'status' => false]);
+            }
+            $data = ProductDiscountsModel::where('product_id',$product->id)->first();
+            $data->display = $request->get('display');
+            $data->save();
+
+            return response()->json(['message' => 'Cập nhật trạng thái sản phẩm thành công', 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }
     }
 

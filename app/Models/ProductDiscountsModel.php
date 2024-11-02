@@ -14,6 +14,7 @@ class ProductDiscountsModel extends Model
         'date_start',
         'date_end',
         'number',
-        'discount'
+        'discount',
+        'display'
     ];
 }

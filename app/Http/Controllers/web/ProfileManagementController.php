@@ -307,6 +307,13 @@ class ProfileManagementController extends Controller
                 ->where('display', '=', 1)
                 ->count();
 
+            // Thống kê số tin nhắn chưa đọc
+            $unreadSenderCount = DB::table('messages')
+                ->where('is_read', 0)
+                ->where('receiver_id ', $user->id)
+                ->distinct('sender_id')
+                ->count('sender_id');
+
             // Thống kê số đơn hàng theo ngày
             $dailyOrders = DB::table('orders')
                 ->select(
@@ -358,8 +365,9 @@ class ProfileManagementController extends Controller
                     'orders' => $orders,
                     'daily_orders' => $dailyOrders,
                     'out_of_stock_products' => $outOfStockProducts,
-                     'rejectedProducts'=>$rejectedProducts,
-                     'ga4' => $ga4Data
+                    'unreadSenderCount' => $unreadSenderCount,
+                    'rejectedProducts'=>$rejectedProducts,
+                    'ga4' => $ga4Data
                 ],
                 'status' => true
             ]);

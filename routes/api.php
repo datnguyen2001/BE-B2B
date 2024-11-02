@@ -91,6 +91,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('detail-product-shop/{id}', [ShopController::class, 'detailProductShop']);
     Route::post('set-product-discount/{id}', [ShopController::class, 'setProductDiscount']);
     Route::get('search-product-shop', [ShopController::class, 'searchProductShop']);
+    Route::get('set-display-product-discount/{id}', [ShopController::class, 'setDisplayProductDiscount']);
 
     Route::get('get-request-supplier-user', [RequestSupplierController::class, 'getRequestSupplierUser']);
     Route::post('create-request-supplier', [RequestSupplierController::class, 'createRequestSupplier']);

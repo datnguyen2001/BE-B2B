@@ -50,7 +50,8 @@ class CartController extends Controller
                             $join->on('p.id', '=', 'pd.product_id')
                                 ->whereDate('pd.date_start', '<=', now())
                                 ->whereDate('pd.date_end', '>=', now())
-                                ->where('pd.number', '>=', $item['quantity']);
+                                ->where('pd.number', '>=', $item['quantity'])
+                                ->where('pd.display', 1);
                         })
                         ->leftJoin('products_attribute as pa', function ($join) use ($item) {
                             $join->on('p.id', '=', 'pa.product_id')
@@ -314,7 +315,8 @@ class CartController extends Controller
                             $join->on('p.id', '=', 'pd.product_id')
                                 ->whereDate('pd.date_start', '<=', now())
                                 ->whereDate('pd.date_end', '>=', now())
-                                ->where('pd.number', '>=', $quantity);
+                                ->where('pd.number', '>=', $quantity)
+                                ->where('pd.display', 1);
                         })
                         ->leftJoin('products_attribute as pa', function ($join) use ($quantity) {
                             $join->on('p.id', '=', 'pa.product_id')
@@ -376,7 +378,8 @@ class CartController extends Controller
                 $join->on('p.id', '=', 'pd.product_id')
                     ->whereDate('pd.date_start', '<=', now())
                     ->whereDate('pd.date_end', '>=', now())
-                    ->where('pd.number', '>=', $quantity);
+                    ->where('pd.number', '>=', $quantity)
+                    ->where('pd.display', 1);
             })
             ->leftJoin('products_attribute as pa', function ($join) use ($quantity) {
                 $join->on('p.id', '=', 'pa.product_id')
@@ -510,6 +513,7 @@ class CartController extends Controller
                         ->where('number', '>=', $quantity)
                         ->whereDate('date_start', '<=', now())
                         ->whereDate('date_end', '>=', now())
+                        ->where('display', 1)
                         ->orderBy('number', 'desc')
                         ->first();
 
