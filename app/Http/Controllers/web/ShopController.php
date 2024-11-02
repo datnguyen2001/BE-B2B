@@ -219,7 +219,6 @@ class ShopController extends Controller
                         ->whereDate('pd.date_start', '<=', now())
                         ->whereDate('pd.date_end', '>=', now())
                         ->where('pd.number', '>', 0)
-                        ->where('pd.display', 1);
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
@@ -239,6 +238,7 @@ class ShopController extends Controller
                     'p.status',
                     'p.src',
                     'p.minimum_quantity as min_quantity',
+                    'pd.display as discount_display',
                     DB::raw('MIN(pa.price) as original_price'),
                     DB::raw('IFNULL(pd.date_start, NULL) as discount_date_start'),
                     DB::raw('IFNULL(pd.date_end, NULL) as discount_date_end'),
@@ -266,7 +266,8 @@ class ShopController extends Controller
                     'ask_count',
                     'discount_date_start',
                     'discount_date_end',
-                    'pd.number'
+                    'pd.number',
+                    'discount_display'
                 )
                 ->paginate(20);
             foreach ($data as $item) {
