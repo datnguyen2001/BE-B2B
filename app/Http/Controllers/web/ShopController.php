@@ -242,7 +242,7 @@ class ShopController extends Controller
                     DB::raw('MIN(pa.price) as original_price'),
                     DB::raw('IFNULL(pd.date_start, NULL) as discount_date_start'),
                     DB::raw('IFNULL(pd.date_end, NULL) as discount_date_end'),
-                    DB::raw('IFNULL(pd.number, 0) as number_discount'),
+                    DB::raw('IFNULL(pd.number, 0) as discount_number'),
                     DB::raw('IFNULL(MAX(pd.discount), 0) as discount'),
                     DB::raw('ROUND(IF(MAX(pd.discount) IS NOT NULL, MIN(pa.price) - (MIN(pa.price) * MAX(pd.discount) / 100), MIN(pa.price)),0) as final_price'), // Consistent use of MIN() and MAX()
                     DB::raw('IFNULL(pr.name, "Toàn quốc") as province_name'),
@@ -263,7 +263,10 @@ class ShopController extends Controller
                     'p.src',
                     'p.minimum_quantity',
                     'pr.name',
-                    'ask_count'
+                    'ask_count',
+                    'discount_date_start',
+                    'discount_date_end',
+                    'pd.number'
                 )
                 ->paginate(20);
             foreach ($data as $item) {
