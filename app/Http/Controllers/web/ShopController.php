@@ -218,7 +218,7 @@ class ShopController extends Controller
                     $join->on('p.id', '=', 'pd.product_id')
                         ->whereDate('pd.date_start', '<=', now())
                         ->whereDate('pd.date_end', '>=', now())
-                        ->where('pd.number', '>', 0)
+                        ->where('pd.number', '>', 0);
                 })
                 ->leftJoin('shop as s', 'p.shop_id', '=', 's.id')
                 ->leftJoin('province as pr', 's.scope', '=', 'pr.province_id')
