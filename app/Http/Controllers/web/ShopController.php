@@ -29,6 +29,7 @@ class ShopController extends Controller
                     's.user_id',
                     's.address_detail',
                     's.display',
+                    's.avatar', // Add the avatar field here
                     DB::raw("CONCAT(s.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
                     DB::raw("CONCAT( d.name, ', ', p.name) as sub_address"),
                     DB::raw("COUNT(fs.id) as total_followers_shop"),
@@ -39,6 +40,7 @@ class ShopController extends Controller
                     's.user_id',
                     's.address_detail',
                     's.display',
+                    's.avatar', 
                     'w.name',
                     'd.name',
                     'p.name'
