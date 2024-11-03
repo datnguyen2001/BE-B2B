@@ -31,7 +31,7 @@ class ProfileManagementController extends Controller
                 ->join('province as p', 'o.province_id', '=', 'p.province_id')
                 ->join('district as d', 'o.district_id', '=', 'd.district_id')
                 ->join('wards as w', 'o.ward_id', '=', 'w.wards_id')
-                ->where('oi.shop_id', $shop->id)
+                ->where('o.shop_id', $shop->id)
                 ->select(
                     'o.user_id',
                     'u.name',
