@@ -26,6 +26,7 @@ class ShopController extends Controller
                 ->where('s.id', $id)
                 ->select(
                     's.id',
+                    's.name',
                     's.user_id',
                     's.address_detail',
                     's.display',
@@ -39,6 +40,7 @@ class ShopController extends Controller
                 ->groupBy(
                     's.id',
                     's.user_id',
+                    's.name',
                     's.address_detail',
                     's.display',
                     's.avatar',
