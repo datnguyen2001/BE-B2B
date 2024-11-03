@@ -319,7 +319,7 @@ class ProfileManagementController extends Controller
             // Thống kê số tin nhắn chưa đọc
             $unreadSenderCount = DB::table('messages')
                 ->where('is_read', 0)
-                ->where('receiver_id ', $user->id)
+                ->where('receiver_id', $user->id)
                 ->distinct('sender_id')
                 ->count('sender_id');
 
