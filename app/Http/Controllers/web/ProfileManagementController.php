@@ -28,24 +28,33 @@ class ProfileManagementController extends Controller
             $customersQuery = DB::table('orders as o')
                 ->join('orders_item as oi', 'o.id', '=', 'oi.order_id')
                 ->join('users as u', 'o.user_id', '=', 'u.id')
-                ->join('province as p', 'o.province_id', '=', 'p.province_id')
-                ->join('district as d', 'o.district_id', '=', 'd.district_id')
-                ->join('wards as w', 'o.ward_id', '=', 'w.wards_id')
+                ->leftJoin('delivery_address as da', function($join) {
+                    $join->on('u.id', '=', 'da.user_id')
+                        ->where('da.display', '=', 1);
+                })
+                ->leftJoin('province as p', 'da.province_id', '=', 'p.province_id')
+                ->leftJoin('district as d', 'da.district_id', '=', 'd.district_id')
+                ->leftJoin('wards as w', 'da.ward_id', '=', 'w.wards_id')
                 ->where('o.shop_id', $shop->id)
                 ->select(
                     'o.user_id',
                     'u.name',
                     'u.phone',
                     'u.avatar',
-                    DB::raw("CONCAT(o.address_detail, ', ', w.name, ', ', d.name, ', ', p.name) as full_address"),
+                    DB::raw("IFNULL(CONCAT(da.address_detail, ', ', w.name, ', ', d.name, ', ', p.name), 'Địa chỉ chưa cập nhật') as full_address"),
                     DB::raw('SUM(oi.total_money) as total_spent'),
                     DB::raw('COUNT(DISTINCT o.id) as total_orders')
-                );
+                )
+                ->groupBy('o.user_id', 'u.name', 'u.phone', 'u.avatar', 'full_address');
+
             if ($keySearch) {
-                $customersQuery->where('u.name', 'LIKE', '%' . $keySearch . '%')
-                    ->orWhere('u.phone', 'LIKE', '%' . $keySearch . '%');
+                $customersQuery->where(function($query) use ($keySearch) {
+                    $query->where('u.name', 'LIKE', '%' . $keySearch . '%')
+                        ->orWhere('u.phone', 'LIKE', '%' . $keySearch . '%');
+                });
             }
-            $customers = $customersQuery->groupBy('o.user_id', 'u.name', 'u.phone', 'u.avatar', 'full_address')
+
+            $customers = $customersQuery
                 ->orderBy('total_spent', 'desc')
                 ->paginate(16);
 
