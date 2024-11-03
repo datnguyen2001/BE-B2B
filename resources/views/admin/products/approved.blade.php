@@ -39,7 +39,7 @@
                                             @foreach($listData as $item)
                                                 <div class="w-100 d-flex mb-5 pt-2 pb-2 content__product align-items-center">
                                                     <div style="width: 15%" class="d-flex justify-content-center">
-                                                        <img src="{{asset($item->src[0])}}" alt="" class="w-75 mr-3" style="border-radius: 4px">
+                                                        <img src="{{asset(@$item->src[0])}}" alt="" class="w-75 mr-3" style="border-radius: 4px">
                                                     </div>
                                                     <div style="width: 20%" class="d-flex justify-content-center">
                                                         <p>{{$item->category_name}}</p>
