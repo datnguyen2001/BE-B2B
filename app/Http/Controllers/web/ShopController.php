@@ -72,9 +72,13 @@ class ShopController extends Controller
                     DB::raw("CONCAT( d.name, ', ', p.name) as sub_address")
                 )
                 ->first();
-            $data->src = json_decode($data->src, true);
-            if ($data->display == 0){
-                return response()->json(['message'=>'Cửa hàng của bạn đã bị xóa','status'=>true]);
+            if (isset($data)){
+                $data->src = json_decode($data->src, true);
+                if ($data->display == 0){
+                    return response()->json(['message'=>'Cửa hàng của bạn đã bị xóa','status'=>true]);
+                }
+            }else{
+                $data = [];
             }
 
             return response()->json(['message'=>'Lấy dữ liệu thành công','data'=>$data,'status'=>true]);
