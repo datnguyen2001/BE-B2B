@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\web;
 
+use App\Events\NotifyUser;
 use App\Http\Controllers\Controller;
+use App\Models\NotificationModel;
 use App\Models\QuotesModel;
 use App\Models\RequestSupplierModel;
 use Illuminate\Http\Request;
@@ -54,6 +56,17 @@ class QuotesController extends Controller
             $data->price = $request->get('price');
             $data->address = $request->get('address');
             $data->save();
+
+            $product = RequestSupplierModel::find($data->request_supplier_id);
+            $notification = new NotificationModel();
+            $notification->sender_id = $user->id;
+            $notification->receiver_id=$product->user_id;
+            $notification->message = 'Bạn có một đơn báo giá từ ' . $user->name;
+            $notification->is_read = 0;
+            $notification->type = 'create-quotes';
+            $notification->save();
+
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
 
             return response()->json(['message' => 'Tạo báo giá thành công', 'status' => true]);
         } catch (\Exception $e) {

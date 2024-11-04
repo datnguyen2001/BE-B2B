@@ -63,6 +63,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('favorite-product', [ProductsController::class, 'favoriteProduct']);
     Route::get('get-favorite-product', [ProductsController::class, 'getFavoriteProducts']);
     Route::get('check-shop', [AuthController::class, 'checkShop']);
+    Route::get('get-notification', [AuthController::class, 'getNotification']);
+    Route::get('read-messages/{id}', [AuthController::class, 'readMessages']);
 
     Route::get('get-client', [ProfileManagementController::class, 'getClient']);
     Route::post('user-order', [ProfileManagementController::class, 'userOrder']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Mail\VerificationCodes;
 use App\Models\FollowShopsModel;
+use App\Models\NotificationModel;
 use App\Models\ShopModel;
 use App\Models\User;
 use App\Models\UserVerificationModel;
@@ -233,6 +234,36 @@ class AuthController extends Controller
             }else{
                 return response()->json(['message' => 'Theo dõi shop thành công','data'=>false, 'status' => true]);
             }
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function getNotification()
+    {
+        try {
+            $user = JWTAuth::user();
+            $notifications = NotificationModel::where('receiver_id', $user->id)
+                ->join('users as sender', 'notifications.sender_id', '=', 'sender.id')
+                ->select('notifications.*', 'sender.name as sender_name','sender.avatar as sender_avatar')
+                ->paginate(5);
+
+            return response()->json(['message' => 'Lấy danh sách thông báo thành công','data'=>$notifications, 'status' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function readMessages($id)
+    {
+        try {
+            $notifications = NotificationModel::find($id);
+            $notifications->is_read=1;
+            $notifications->save();
+
+            return response()->json(['message' => 'Đọc thông báo thành công','data'=>true, 'status' => true]);
 
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);

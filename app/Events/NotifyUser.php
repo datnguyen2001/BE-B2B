@@ -18,16 +18,18 @@ class NotifyUser implements ShouldBroadcast
     public $receiver_id;
     public $avatar;
     public $sender_name;
+    public $type;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($message, $receiver_id,$avatar, $sender_name)
+    public function __construct($message, $receiver_id,$avatar, $sender_name, $type)
     {
         $this->message = $message;
         $this->receiver_id = $receiver_id;
         $this->avatar = $avatar;
         $this->sender_name = $sender_name;
+        $this->type = $type;
     }
 
     /**

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\web;
 
+use App\Events\NotifyUser;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryAddressModel;
+use App\Models\NotificationModel;
 use App\Models\OrdersItemModel;
 use App\Models\OrdersModel;
 use App\Models\OrderTotalModel;
 use App\Models\ProductsModel;
+use App\Models\ShopModel;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -245,11 +249,29 @@ class CartController extends Controller
         $cartItems = json_decode($cartItemsJson, true);
 
         $itemFound = false;
-        $product = DB::table('products')
-            ->join('products_attribute', 'products.id', '=', 'products_attribute.product_id')
-            ->where('products.id', $productId)
-            ->where('products.shop_id', $shopId)
-            ->select('products.quantity')
+        $product = DB::table('products as p')
+            ->join('products_attribute as pa', 'p.id', '=', 'pa.product_id')
+            ->leftJoin('product_discounts as pd', function ($join) use ($newQuantity) {
+                $join->on('p.id', '=', 'pd.product_id')
+                    ->whereDate('pd.date_start', '<=', now())
+                    ->whereDate('pd.date_end', '>=', now())
+                    ->where('pd.number', '>=', $newQuantity)
+                    ->where('pd.display', 1);
+            })
+            ->leftJoin('products_attribute as pa_price', function ($join) use ($newQuantity) {
+                $join->on('p.id', '=', 'pa_price.product_id')
+                    ->where('pa_price.quantity', '<=', $newQuantity)
+                    ->where(function($query) use ($newQuantity) {
+                        $query->where('pa_price.quantity', '=', $newQuantity)
+                            ->orWhere(function($subquery) use ($newQuantity) {
+                                $subquery->where('pa_price.quantity', '<=', $newQuantity)
+                                    ->whereRaw('pa_price.quantity = (SELECT MAX(quantity) FROM products_attribute WHERE quantity <= ? AND product_id = pa_price.product_id)', [$newQuantity]);
+                            });
+                    });
+            })
+            ->where('p.id', $productId)
+            ->where('p.shop_id', $shopId)
+            ->select('p.quantity', 'pd.discount_price as discount_price', 'pa_price.price as attribute_price')
             ->first();
 
         if (!$product) {
@@ -263,6 +285,7 @@ class CartController extends Controller
                         return response()->json(['message' => 'Số lượng sản phẩm vượt quá số lượng tồn kho', 'status' => false]);
                     }
                     $item['quantity'] = $newQuantity;
+                    $item['price'] = $product->discount_price ?? $product->attribute_price;
                 } else {
                     $cartItems = array_filter($cartItems, function ($cartItem) use ($productId, $shopId) {
                         return !($cartItem['product_id'] == $productId && $cartItem['shop_id'] == $shopId);
@@ -540,6 +563,28 @@ class CartController extends Controller
                 $totalProductCost += $orderTotalMoney;
                 $totalShip += $order->shipping_fee;
                 $totalPayment += $order->total_payment;
+
+                $shop = ShopModel::find($order->shop_id);
+                $notification = new NotificationModel();
+                $notification->sender_id = $user->id;
+                $notification->receiver_id=$shop->user_id;
+                $notification->message = 'Bạn có một đơn hàng mới từ ' . $user->name;
+                $notification->is_read = 0;
+                $notification->type = 'create-order';
+                $notification->save();
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
+
+                $shop = ShopModel::find($order->shop_id);
+                $receiver= User::find($shop->user_id);
+                $notification = new NotificationModel();
+                $notification->sender_id = $shop->user_id;
+                $notification->receiver_id=$user->id;
+                $notification->message = 'Bạn vừa mua một đơn hàng mới từ ' . $receiver->name;
+                $notification->is_read = 0;
+                $notification->type = 'create-order';
+                $notification->save();
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$receiver->avatar, $receiver->name,$notification->type))->toOthers();
+
             }
             $order_total = new OrderTotalModel();
             $order_total->order_id = implode(',', $orderIds);

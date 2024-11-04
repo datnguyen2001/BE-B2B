@@ -8,8 +8,8 @@ use App\Models\AskToBuyModel;
 use App\Models\NotificationModel;
 use App\Models\ProductFavoritesModel;
 use App\Models\ProductReportModel;
+use App\Models\ProductsModel;
 use App\Models\ShopModel;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -835,7 +835,6 @@ class ProductsController extends Controller
             $ask->save();
 
             $shop = ShopModel::find($request->shop_id);
-            $receiver= User::find($shop->user_id);
             $notification = new NotificationModel();
             $notification->sender_id = $user->id;
             $notification->receiver_id=$shop->user_id;
@@ -844,7 +843,7 @@ class ProductsController extends Controller
             $notification->type = 'ask-buy';
             $notification->save();
 
-            broadcast(new NotifyUser($notification->message, $notification->user_id,$receiver->avatar, $receiver->name))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
 
             return response()->json(['message'=>'Hỏi mua hàng thành công', 'status' => true]);
         }catch (\Exception $e){
@@ -861,6 +860,18 @@ class ProductsController extends Controller
             $report->product_id = $request->get('product_id');
             $report->content = $request->get('content');
             $report ->save();
+
+            $product = ProductsModel::find($report->product_id);
+            $shop = ShopModel::find($product->shop_id);
+            $notification = new NotificationModel();
+            $notification->sender_id = $user->id;
+            $notification->receiver_id=$shop->user_id;
+            $notification->message = 'Bạn có một báo cáo về sản phẩm từ ' . $user->name;
+            $notification->is_read = 0;
+            $notification->type = 'product-report';
+            $notification->save();
+
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
 
             return response()->json(['message'=>'Báo cáo sản phẩm thành công', 'status' => true]);
         }catch (\Exception $e){
