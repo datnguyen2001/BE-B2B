@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\web;
 
+use App\Events\NotifyUser;
 use App\Http\Controllers\Controller;
 use App\Models\AskToBuyModel;
+use App\Models\NotificationModel;
 use App\Models\ProductFavoritesModel;
 use App\Models\ProductReportModel;
+use App\Models\ShopModel;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -829,6 +833,19 @@ class ProductsController extends Controller
             $ask->quantity = $request->get('quantity');
             $ask->content = $request->get('content');
             $ask->save();
+
+            $shop = ShopModel::find($request->shop_id);
+            $receiver= User::find($shop->user_id);
+            $notification = new NotificationModel();
+            $notification->sender_id = $user->id;
+            $notification->receiver_id=$shop->user_id;
+            $notification->title = 'Yêu cầu mua hàng mới';
+            $notification->message = 'Bạn có một yêu cầu mua hàng mới từ ' . $user->name;
+            $notification->is_read = 0;
+            $notification->type = 'ask-buy';
+            $notification->save();
+
+            broadcast(new NotifyUser($notification->message, $notification->user_id,$receiver->avatar, $receiver->name))->toOthers();
 
             return response()->json(['message'=>'Hỏi mua hàng thành công', 'status' => true]);
         }catch (\Exception $e){

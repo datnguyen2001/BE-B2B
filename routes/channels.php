@@ -24,3 +24,7 @@ Broadcast::channel('private-chat.{sender_id}-{receiver_id}', function ($user, $s
     }
     return false;
 });
+
+Broadcast::channel('notifications.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id; // Chỉ cho phép người dùng có ID khớp truy cập kênh
+});
