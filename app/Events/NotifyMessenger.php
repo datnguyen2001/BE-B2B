@@ -10,28 +10,21 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NotifyUser implements ShouldBroadcast
+class NotifyMessenger implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
+    public $content;
     public $receiver_id;
-    public $avatar;
-    public $sender_name;
-    public $type;
-    public $notification_id;
-
+    public $conversation_id;
     /**
      * Create a new event instance.
      */
-    public function __construct($message, $receiver_id,$avatar, $sender_name, $type,$notification_id)
+    public function __construct($content, $receiver_id,$conversation_id)
     {
-        $this->message = $message;
+        $this->content = $content;
         $this->receiver_id = $receiver_id;
-        $this->avatar = $avatar;
-        $this->sender_name = $sender_name;
-        $this->type = $type;
-        $this->notification_id = $notification_id;
+        $this->conversation_id = $conversation_id;
     }
 
     /**
@@ -41,11 +34,11 @@ class NotifyUser implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.'.$this->receiver_id);
+        return new PrivateChannel('messenger.'.$this->receiver_id);
     }
 
     public function broadcastAs()
     {
-        return 'user-notification';
+        return 'messenger-notification';
     }
 }

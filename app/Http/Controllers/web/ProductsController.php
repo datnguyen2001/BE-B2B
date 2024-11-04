@@ -838,12 +838,12 @@ class ProductsController extends Controller
             $notification = new NotificationModel();
             $notification->sender_id = $user->id;
             $notification->receiver_id=$shop->user_id;
-            $notification->message = 'Bạn có một yêu cầu mua hàng mới từ ' . $user->name;
+            $notification->message = 'Bạn có một yêu cầu mua hàng mới';
             $notification->is_read = 0;
             $notification->type = 'ask-buy';
             $notification->save();
 
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type,$notification->id))->toOthers();
 
             return response()->json(['message'=>'Hỏi mua hàng thành công', 'status' => true]);
         }catch (\Exception $e){
@@ -866,12 +866,12 @@ class ProductsController extends Controller
             $notification = new NotificationModel();
             $notification->sender_id = $user->id;
             $notification->receiver_id=$shop->user_id;
-            $notification->message = 'Bạn có một báo cáo về sản phẩm từ ' . $user->name;
+            $notification->message = 'Bạn có một báo cáo về sản phẩm '.$product->name;
             $notification->is_read = 0;
             $notification->type = 'product-report';
             $notification->save();
 
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type,$notification->id))->toOthers();
 
             return response()->json(['message'=>'Báo cáo sản phẩm thành công', 'status' => true]);
         }catch (\Exception $e){

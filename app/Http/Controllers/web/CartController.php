@@ -568,11 +568,11 @@ class CartController extends Controller
                 $notification = new NotificationModel();
                 $notification->sender_id = $user->id;
                 $notification->receiver_id=$shop->user_id;
-                $notification->message = 'Bạn có một đơn hàng mới từ ' . $user->name;
+                $notification->message = 'Bạn có một đơn hàng mới';
                 $notification->is_read = 0;
                 $notification->type = 'create-order';
                 $notification->save();
-                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type,$notification->id))->toOthers();
 
                 $shop = ShopModel::find($order->shop_id);
                 $receiver= User::find($shop->user_id);
@@ -583,7 +583,7 @@ class CartController extends Controller
                 $notification->is_read = 0;
                 $notification->type = 'create-order';
                 $notification->save();
-                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$receiver->avatar, $receiver->name,$notification->type))->toOthers();
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id,$receiver->avatar, $receiver->name,$notification->type,$notification->id))->toOthers();
 
             }
             $order_total = new OrderTotalModel();

@@ -144,11 +144,11 @@ class ProfileManagementController extends Controller
             $notification = new NotificationModel();
             $notification->sender_id = $order->user_id;
             $notification->receiver_id = $shop->user_id;
-            $notification->message = 'Đơn hàng ' . $order->order_code . ' đã bị hủy bởi ' . $user->name;
+            $notification->message = 'Đơn hàng ' . $order->order_code . ' đã bị hủy bởi ';
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $user->avatar, $user->name, $notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $user->avatar, $user->name, $notification->type,$notification->id))->toOthers();
 
             $shop = ShopModel::find($order->shop_id);
             $receiver = User::find($shop->user_id);
@@ -159,7 +159,7 @@ class ProfileManagementController extends Controller
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type,$notification->id))->toOthers();
 
             return response()->json(['message' => 'Hủy đơn hàng thành công', 'status' => true]);
         } catch (\Exception $e) {
@@ -322,7 +322,7 @@ class ProfileManagementController extends Controller
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type,$notification->id))->toOthers();
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công', 'status' => true]);
         } catch (\Exception $e) {

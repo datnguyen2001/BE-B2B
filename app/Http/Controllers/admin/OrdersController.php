@@ -125,8 +125,8 @@ class OrdersController extends Controller
                 $notification->is_read = 0;
                 $notification->type = 'create-order';
                 $notification->save();
-                broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type))->toOthers();
-                
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type,$notification->id))->toOthers();
+
                 toastr()->success('Xét trạng thái đơn hàng thành công');
                 return \redirect()->route('admin.order.index', [$status_id]);
             }

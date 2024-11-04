@@ -61,12 +61,12 @@ class QuotesController extends Controller
             $notification = new NotificationModel();
             $notification->sender_id = $user->id;
             $notification->receiver_id=$product->user_id;
-            $notification->message = 'Bạn có một đơn báo giá từ ' . $user->name;
+            $notification->message = 'Bạn có một đơn báo giá mới';
             $notification->is_read = 0;
             $notification->type = 'create-quotes';
             $notification->save();
 
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id,$user->avatar, $user->name,$notification->type,$notification->id))->toOthers();
 
             return response()->json(['message' => 'Tạo báo giá thành công', 'status' => true]);
         } catch (\Exception $e) {

@@ -247,6 +247,7 @@ class AuthController extends Controller
             $notifications = NotificationModel::where('receiver_id', $user->id)
                 ->join('users as sender', 'notifications.sender_id', '=', 'sender.id')
                 ->select('notifications.*', 'sender.name as sender_name','sender.avatar as sender_avatar')
+                ->orderBy('created_at','desc')
                 ->paginate(5);
 
             return response()->json(['message' => 'Lấy danh sách thông báo thành công','data'=>$notifications, 'status' => true]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotifyMessenger;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -44,6 +45,8 @@ class MessageController extends Controller
             'receiver_id' => $request->receiver_id,
             'conversation_id' => $request->conversation_id
         ]);
+
+        broadcast(new NotifyMessenger($message->content, $message->receiver_id,$message->conversation_id))->toOthers();
 
         return response()->json([
             'message' => $message,
