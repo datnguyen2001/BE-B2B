@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Events\NotifyUser;
 use App\Http\Controllers\Controller;
 use App\Models\DistrictModel;
+use App\Models\NotificationModel;
 use App\Models\OrdersItemModel;
 use App\Models\OrdersModel;
 use App\Models\ProductsModel;
 use App\Models\ProvinceModel;
 use App\Models\ShopModel;
+use App\Models\User;
 use App\Models\WardsModel;
 use Illuminate\Http\Request;
 
@@ -100,6 +103,30 @@ class OrdersController extends Controller
                     $this->updateQuantityProductWhenCancel($order);
                 }
                 $order->save();
+
+                if ($order->status == 1) {
+                    $status = 'Chờ lấy hàng';
+                }elseif ($order->status == 2){
+                    $status = 'Đang giao';
+                }elseif ($order->status == 3){
+                    $status = 'Đã giao';
+                }elseif ($order->status == 4){
+                    $status = 'Đã hủy';
+                }else{
+                    $status = 'Hoàn đơn';
+                }
+
+                $shop = ShopModel::find($order->shop_id);
+                $receiver = User::find($shop->user_id);
+                $notification = new NotificationModel();
+                $notification->sender_id = $shop->user_id;
+                $notification->receiver_id = $order->user_id;
+                $notification->message = 'Đơn hàng ' . $order->order_code . ' của bạn vừa thay đổi trạng thái thành ' . $status;
+                $notification->is_read = 0;
+                $notification->type = 'create-order';
+                $notification->save();
+                broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type))->toOthers();
+                
                 toastr()->success('Xét trạng thái đơn hàng thành công');
                 return \redirect()->route('admin.order.index', [$status_id]);
             }
