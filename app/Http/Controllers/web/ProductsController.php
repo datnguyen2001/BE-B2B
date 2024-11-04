@@ -839,7 +839,6 @@ class ProductsController extends Controller
             $notification = new NotificationModel();
             $notification->sender_id = $user->id;
             $notification->receiver_id=$shop->user_id;
-            $notification->title = 'Yêu cầu mua hàng mới';
             $notification->message = 'Bạn có một yêu cầu mua hàng mới từ ' . $user->name;
             $notification->is_read = 0;
             $notification->type = 'ask-buy';
