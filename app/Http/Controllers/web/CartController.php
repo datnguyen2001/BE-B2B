@@ -271,7 +271,7 @@ class CartController extends Controller
             })
             ->where('p.id', $productId)
             ->where('p.shop_id', $shopId)
-            ->select('p.quantity', 'pd.discount_price as discount_price', 'pa_price.price as attribute_price')
+            ->select('p.quantity', DB::raw('ROUND(IF(pd.discount IS NOT NULL, pa.price - (pa.price * pd.discount / 100), pa.price), 0) as price'))
             ->first();
 
         if (!$product) {
