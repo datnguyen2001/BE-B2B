@@ -463,6 +463,7 @@ class ProfileManagementController extends Controller
                     'u.name as user_name',
                     'u.phone as user_phone',
                     'p.name as product_name',
+                    'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )
                 ->paginate(20);
@@ -500,6 +501,7 @@ class ProfileManagementController extends Controller
                     'u.name as user_name',
                     'u.phone as user_phone',
                     'p.name as product_name',
+                    'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )
                 ->first();
@@ -539,6 +541,7 @@ class ProfileManagementController extends Controller
                     'u.name as user_name',
                     'u.phone as user_phone',
                     'p.name as product_name',
+                    'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )->paginate(20);
 
@@ -575,6 +578,7 @@ class ProfileManagementController extends Controller
                     'u.name as user_name',
                     'u.phone as user_phone',
                     'p.name as product_name',
+                    'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )->first();
 
