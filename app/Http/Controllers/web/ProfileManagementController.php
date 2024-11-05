@@ -4,8 +4,10 @@ namespace App\Http\Controllers\web;
 
 use App\Events\NotifyUser;
 use App\Http\Controllers\Controller;
+use App\Models\AskToBuyModel;
 use App\Models\NotificationModel;
 use App\Models\OrdersModel;
+use App\Models\ProductReportModel;
 use App\Models\ShopModel;
 use App\Models\User;
 use Carbon\Carbon;
@@ -148,7 +150,7 @@ class ProfileManagementController extends Controller
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $user->avatar, $user->name, $notification->type,$notification->id))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $user->avatar, $user->name, $notification->type, $notification->id))->toOthers();
 
             $shop = ShopModel::find($order->shop_id);
             $receiver = User::find($shop->user_id);
@@ -159,7 +161,7 @@ class ProfileManagementController extends Controller
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type,$notification->id))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type, $notification->id))->toOthers();
 
             return response()->json(['message' => 'Hủy đơn hàng thành công', 'status' => true]);
         } catch (\Exception $e) {
@@ -303,13 +305,13 @@ class ProfileManagementController extends Controller
             $order->save();
             if ($order->status == 1) {
                 $status = 'Chờ lấy hàng';
-            }elseif ($order->status == 2){
+            } elseif ($order->status == 2) {
                 $status = 'Đang giao';
-            }elseif ($order->status == 3){
+            } elseif ($order->status == 3) {
                 $status = 'Đã giao';
-            }elseif ($order->status == 4){
+            } elseif ($order->status == 4) {
                 $status = 'Đã hủy';
-            }else{
+            } else {
                 $status = 'Hoàn đơn';
             }
 
@@ -322,7 +324,7 @@ class ProfileManagementController extends Controller
             $notification->is_read = 0;
             $notification->type = 'create-order';
             $notification->save();
-            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type,$notification->id))->toOthers();
+            broadcast(new NotifyUser($notification->message, $notification->receiver_id, $receiver->avatar, $receiver->name, $notification->type, $notification->id))->toOthers();
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công', 'status' => true]);
         } catch (\Exception $e) {
@@ -427,6 +429,156 @@ class ProfileManagementController extends Controller
                 ],
                 'status' => true
             ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function getAskBuy()
+    {
+        try {
+            $user = JWTAuth::user();
+            $shop = ShopModel::where('user_id', $user->id)->first();
+            $listData = AskToBuyModel::where('ask_to_buy.shop_id', $shop->id)
+                ->join('products as p', 'ask_to_buy.product_id', '=', 'p.id')
+                ->join('users as u', 'ask_to_buy.user_id', '=', 'u.id')
+                ->join(DB::raw("
+                        (SELECT pa.product_id, pa.quantity, pa.price
+                         FROM products_attribute pa
+                         WHERE (pa.product_id, pa.quantity) IN (
+                             SELECT pa2.product_id, MIN(pa2.quantity)
+                             FROM products_attribute pa2
+                             GROUP BY pa2.product_id
+                         )) as pa
+                    "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function ($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
+                })
+                ->select(
+                    'ask_to_buy.*',
+                    'u.name as user_name',
+                    'u.phone as user_phone',
+                    'p.name as product_name',
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
+                )
+                ->paginate(20);
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $listData, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function detailAskBuy($id)
+    {
+        try {
+            $data = AskToBuyModel::where('ask_to_buy.id', $id)
+                ->join('products as p', 'ask_to_buy.product_id', '=', 'p.id')
+                ->join('users as u', 'ask_to_buy.user_id', '=', 'u.id')
+                ->join(DB::raw("
+                        (SELECT pa.product_id, pa.quantity, pa.price
+                         FROM products_attribute pa
+                         WHERE (pa.product_id, pa.quantity) IN (
+                             SELECT pa2.product_id, MIN(pa2.quantity)
+                             FROM products_attribute pa2
+                             GROUP BY pa2.product_id
+                         )) as pa
+                    "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function ($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
+                })
+                ->select(
+                    'ask_to_buy.*',
+                    'u.name as user_name',
+                    'u.phone as user_phone',
+                    'p.name as product_name',
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
+                )
+                ->first();
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function getProductReport()
+    {
+        try {
+            $user = JWTAuth::user();
+            $shop = ShopModel::where('user_id', $user->id)->first();
+            $listData = ProductReportModel::join('products as p', 'product_report.product_id', '=', 'p.id')
+                ->where('p.shop_id', $shop->id)
+                ->join('users as u', 'product_report.user_id', '=', 'u.id')
+                ->join(DB::raw("
+                (SELECT pa.product_id, pa.quantity, pa.price
+                 FROM products_attribute pa
+                 WHERE (pa.product_id, pa.quantity) IN (
+                     SELECT pa2.product_id, MIN(pa2.quantity)
+                     FROM products_attribute pa2
+                     GROUP BY pa2.product_id
+                 )) as pa
+            "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function ($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
+                })
+                ->select(
+                    'product_report.*',
+                    'u.name as user_name',
+                    'u.phone as user_phone',
+                    'p.name as product_name',
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
+                )->paginate(20);
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $listData, 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function detailProductReport($id)
+    {
+        try {
+            $data = ProductReportModel::where('product_report.id', $id)
+                ->join('products as p', 'product_report.product_id', '=', 'p.id')
+                ->join('users as u', 'product_report.user_id', '=', 'u.id')
+                ->join(DB::raw("
+                                (SELECT pa.product_id, pa.quantity, pa.price
+                                 FROM products_attribute pa
+                                 WHERE (pa.product_id, pa.quantity) IN (
+                                     SELECT pa2.product_id, MIN(pa2.quantity)
+                                     FROM products_attribute pa2
+                                     GROUP BY pa2.product_id
+                                 )) as pa
+                            "), 'p.id', '=', 'pa.product_id')
+                ->leftJoin('product_discounts as pd', function ($join) {
+                    $join->on('p.id', '=', 'pd.product_id')
+                        ->whereDate('pd.date_start', '<=', now())
+                        ->whereDate('pd.date_end', '>=', now())
+                        ->where('pd.number', '>', 0)
+                        ->where('pd.display', 1);
+                })
+                ->select(
+                    'product_report.*',
+                    'u.name as user_name',
+                    'u.phone as user_phone',
+                    'p.name as product_name',
+                    DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
+                )->first();
+
+            return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }

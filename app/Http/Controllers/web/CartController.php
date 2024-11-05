@@ -581,7 +581,7 @@ class CartController extends Controller
                 $notification->receiver_id=$user->id;
                 $notification->message = 'Bạn vừa mua một đơn hàng mới từ ' . $receiver->name;
                 $notification->is_read = 0;
-                $notification->type = 'create-order';
+                $notification->type = 'my-order';
                 $notification->save();
                 broadcast(new NotifyUser($notification->message, $notification->receiver_id,$receiver->avatar, $receiver->name,$notification->type,$notification->id))->toOthers();
 
