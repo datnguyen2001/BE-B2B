@@ -114,6 +114,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('select-default-address/{id}', [DeliveryAddressController::class, 'selectDefaultAddress']);
 
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('check-online', [AuthController::class, 'checkOnline']);
 
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/{userId}/{receiverId}', [MessageController::class, 'index']);

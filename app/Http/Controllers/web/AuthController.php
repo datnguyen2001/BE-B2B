@@ -80,6 +80,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Tài khoản của bạn đã bị khóa', 'status' => true]);
         }
         $user->token = $token;
+        $user->is_online = 1;
         $user->save();
 
         return response()->json(['message' => 'Đăng nhập thành công', 'data' => $user, 'status' => true]);
@@ -145,9 +146,23 @@ class AuthController extends Controller
             JWTAuth::setToken($token);
             JWTAuth::invalidate($token);
             $user->token = null;
+            $user->is_online = 0;
             $user->save();
 
             return response()->json(['message' => 'Đăng xuất thành công', 'status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => false]);
+        }
+    }
+
+    public function checkOnline(Request $request)
+    {
+        try {
+            $user = JWTAuth::user();
+            $user->is_online = $request->get('is_online');
+            $user->save();
+
+            return response()->json(['message' => 'Cập nhật trạng thái thành công', 'status' => true]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage(), 'status' => false]);
         }
