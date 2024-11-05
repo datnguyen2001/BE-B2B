@@ -158,7 +158,7 @@ class AuthController extends Controller
     public function checkOnline(Request $request)
     {
         try {
-            $user = JWTAuth::user();
+            $user = User::find($request->get('user_id'));
             $user->is_online = $request->get('is_online');
             $user->save();
 

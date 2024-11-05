@@ -465,8 +465,7 @@ class ProfileManagementController extends Controller
                     'p.name as product_name',
                     'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
-                )
-                ->paginate(20);
+                )->orderBy('created_at','desc')->paginate(20);
             foreach ($listData as $item) {
                 $item->product_src = json_decode($item->product_src, true);
             }
@@ -547,7 +546,7 @@ class ProfileManagementController extends Controller
                     'p.name as product_name',
                     'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
-                )->paginate(20);
+                )->orderBy('created_at','desc')->paginate(20);
             foreach ($listData as $item) {
                 $item->product_src = json_decode($item->product_src, true);
             }

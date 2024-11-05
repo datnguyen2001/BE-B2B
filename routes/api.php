@@ -54,6 +54,8 @@ Route::get('wards/{district_id}', [AddressController::class, 'wards']);
 
 Route::post('test-chat/broadcast', [PusherController::class, 'broadcast'])->name('test-chat.broadcast');
 Route::post('test-chat/receive', [PusherController::class, 'receive'])->name('test-chat.receive');
+Route::post('check-online', [AuthController::class, 'checkOnline']);
+
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('get-profile', [AuthController::class, 'getProfile']);
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
@@ -118,7 +120,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('select-default-address/{id}', [DeliveryAddressController::class, 'selectDefaultAddress']);
 
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('check-online', [AuthController::class, 'checkOnline']);
 
     Route::post('/messages', [MessageController::class, 'store']);
     Route::get('/messages/{userId}/{receiverId}', [MessageController::class, 'index']);
