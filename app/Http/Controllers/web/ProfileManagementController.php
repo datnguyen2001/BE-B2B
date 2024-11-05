@@ -467,6 +467,9 @@ class ProfileManagementController extends Controller
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )
                 ->paginate(20);
+            foreach ($listData as $item) {
+                $item->product_src = json_decode($item->product_src, true);
+            }
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $listData, 'status' => true]);
         } catch (\Exception $e) {
@@ -505,6 +508,7 @@ class ProfileManagementController extends Controller
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )
                 ->first();
+            $data->product_src = json_decode($data->product_src, true);
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
         } catch (\Exception $e) {
@@ -544,6 +548,9 @@ class ProfileManagementController extends Controller
                     'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )->paginate(20);
+            foreach ($listData as $item) {
+                $item->product_src = json_decode($item->product_src, true);
+            }
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $listData, 'status' => true]);
         } catch (\Exception $e) {
@@ -581,6 +588,7 @@ class ProfileManagementController extends Controller
                     'p.src as product_src',
                     DB::raw('ROUND(pa.price - (pa.price * IFNULL(pd.discount, 0) / 100), 0) as product_price')
                 )->first();
+            $data->product_src = json_decode($data->product_src, true);
 
             return response()->json(['message' => 'Lấy dữ liệu thành công', 'data' => $data, 'status' => true]);
         } catch (\Exception $e) {
