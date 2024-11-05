@@ -16,22 +16,22 @@ class NotifyUser implements ShouldBroadcast
 
     public $message;
     public $receiver_id;
-    public $avatar;
+    public $sender_avatar;
     public $sender_name;
     public $type;
-    public $notification_id;
+    public $id;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($message, $receiver_id,$avatar, $sender_name, $type,$notification_id)
+    public function __construct($message, $receiver_id,$sender_avatar, $sender_name, $type,$id)
     {
         $this->message = $message;
         $this->receiver_id = $receiver_id;
-        $this->avatar = $avatar;
+        $this->sender_avatar = $sender_avatar;
         $this->sender_name = $sender_name;
         $this->type = $type;
-        $this->notification_id = $notification_id;
+        $this->id = $id;
     }
 
     /**
