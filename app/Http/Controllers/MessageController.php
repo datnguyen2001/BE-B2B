@@ -119,14 +119,14 @@ class MessageController extends Controller
                 ->where('user2_id', $user1_id);
         })->first();
         if ($data){
-            return response()->json(['status' => true, 'message' => 'Cuộc hội thoại đã tồn tại.']);
+            return response()->json(['status' => true,'data'=>$data, 'message' => 'Cuộc hội thoại đã tồn tại.']);
         }else{
             $conversations = new Conversation();
             $conversations->user1_id = $user1_id;
             $conversations->user2_id = $user2_id;
             $conversations->save();
 
-            return response()->json(['status' => true, 'message' => 'Tạo cuộc hội thoại thành công.']);
+            return response()->json(['status' => true,'data'=>$conversations, 'message' => 'Tạo cuộc hội thoại thành công.']);
         }
 
     }
