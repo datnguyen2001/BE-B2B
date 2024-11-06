@@ -109,12 +109,26 @@ class MessageController extends Controller
 
     public function createConversations(Request $request)
     {
-        $conversations = new Conversation();
-        $conversations->user1_id = $request->get('user1_id');
-        $conversations->user2_id = $request->get('user2_id');
-        $conversations->save();
+        $user1_id = $request->get('user1_id');
+        $user2_id = $request->get('user2_id');
+        $data = Conversation::where(function ($query) use ($user1_id, $user2_id) {
+            $query->where('user1_id', $user1_id)
+                ->where('user2_id', $user2_id);
+        })->orWhere(function ($query) use ($user1_id, $user2_id) {
+            $query->where('user1_id', $user2_id)
+                ->where('user2_id', $user1_id);
+        })->first();
+        if ($data){
+            return response()->json(['status' => true, 'message' => 'Cuộc hội thoại đã tồn tại.']);
+        }else{
+            $conversations = new Conversation();
+            $conversations->user1_id = $user1_id;
+            $conversations->user2_id = $user2_id;
+            $conversations->save();
 
-        return response()->json(['status' => true, 'message' => 'Tạo cuộc hội thoại thành công.']);
+            return response()->json(['status' => true, 'message' => 'Tạo cuộc hội thoại thành công.']);
+        }
+
     }
 
     public function markAsRead($userId, $conversationId)
