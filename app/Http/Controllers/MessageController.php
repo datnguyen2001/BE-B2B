@@ -107,6 +107,16 @@ class MessageController extends Controller
         return response()->json(['data' => $conversations->values(), 'status' => true]);
     }
 
+    public function createConversations(Request $request)
+    {
+        $conversations = new Conversation();
+        $conversations->user1_id = $request->get('user1_id');
+        $conversations->user2_id = $request->get('user2_id');
+        $conversations->save();
+
+        return response()->json(['status' => true, 'message' => 'Tạo cuộc hội thoại thành công.']);
+    }
+
     public function markAsRead($userId, $conversationId)
     {
         Message::where('receiver_id', $userId)
