@@ -30,5 +30,7 @@ Broadcast::channel('notifications.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('messenger.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id; // Chỉ cho phép người dùng có ID khớp truy cập kênh
+    $conversation = \App\Models\Conversation::find($id);
+
+    return $conversation && ($conversation->user1_id === $user->id || $conversation->user2_id === $user->id);
 });
