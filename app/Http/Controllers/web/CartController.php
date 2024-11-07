@@ -285,7 +285,7 @@ class CartController extends Controller
                         return response()->json(['message' => 'Số lượng sản phẩm vượt quá số lượng tồn kho', 'status' => false]);
                     }
                     $item['quantity'] = $newQuantity;
-                    $item['price'] = $product->discount_price ?? $product->attribute_price;
+                    $item['price'] = $product->price;
                 } else {
                     $cartItems = array_filter($cartItems, function ($cartItem) use ($productId, $shopId) {
                         return !($cartItem['product_id'] == $productId && $cartItem['shop_id'] == $shopId);
