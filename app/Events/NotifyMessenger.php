@@ -17,14 +17,16 @@ class NotifyMessenger implements ShouldBroadcast
     public $content;
     public $receiver_id;
     public $conversation_id;
+    public $created_at;
     /**
      * Create a new event instance.
      */
-    public function __construct($content, $receiver_id,$conversation_id)
+    public function __construct($content, $receiver_id,$conversation_id,$created_at)
     {
         $this->content = $content;
         $this->receiver_id = $receiver_id;
         $this->conversation_id = $conversation_id;
+        $this->created_at = $created_at;
     }
 
     /**
