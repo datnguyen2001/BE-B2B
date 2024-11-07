@@ -77,6 +77,7 @@ class CartController extends Controller
                             'p.unit',
                             'p.en_unit',
                             'p.src',
+                            'p.minimum_quantity',
                             'p.quantity as inventory_quantity',
                             'pa.price as attribute_price',
                             'pd.discount',
