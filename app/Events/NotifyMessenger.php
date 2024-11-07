@@ -15,13 +15,15 @@ class NotifyMessenger implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $content;
+    public $receiver_id;
     public $conversation_id;
     /**
      * Create a new event instance.
      */
-    public function __construct($content,$conversation_id)
+    public function __construct($content, $receiver_id,$conversation_id)
     {
         $this->content = $content;
+        $this->receiver_id = $receiver_id;
         $this->conversation_id = $conversation_id;
     }
 
