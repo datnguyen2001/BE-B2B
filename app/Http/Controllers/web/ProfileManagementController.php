@@ -401,7 +401,7 @@ class ProfileManagementController extends Controller
                         'fieldName' => 'pagePath',
                         'stringFilter' => [
                             'matchType' => 'EXACT',
-                            'value' => '/'
+                            'value' => '/store-information/'. $shop->id
                         ]
                     ]
                 ]
