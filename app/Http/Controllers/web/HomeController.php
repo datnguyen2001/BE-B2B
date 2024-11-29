@@ -47,12 +47,14 @@ class HomeController extends Controller
             $data = DB::table('category as c')
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
-                ->where(function($query) {
-                    $query->where('p.display', 1)
-                        ->where('p.status', 1)
-                        ->orWhereNull('p.id');
-                })
-                ->select('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->select(
+                    'c.id',
+                    'c.name',
+                    'c.name_en',
+                    'c.slug',
+                    'c.src',
+                    DB::raw('COUNT(CASE WHEN p.display = 1 AND p.status = 1 THEN 1 END) as product_count')
+                )
                 ->groupBy('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src')
                 ->paginate(14);
 
@@ -68,12 +70,14 @@ class HomeController extends Controller
             $data = DB::table('category as c')
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
-                ->where(function($query) {
-                    $query->where('p.display', 1)
-                        ->where('p.status', 1)
-                        ->orWhereNull('p.id');
-                })
-                ->select('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->select(
+                    'c.id',
+                    'c.name',
+                    'c.name_en',
+                    'c.slug',
+                    'c.src',
+                    DB::raw('COUNT(CASE WHEN p.display = 1 AND p.status = 1 THEN 1 END) as product_count')
+                )
                 ->groupBy('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src')
                 ->get();
 
