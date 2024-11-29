@@ -47,10 +47,13 @@ class HomeController extends Controller
             $data = DB::table('category as c')
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
-                ->where('p.display', 1)
-                ->where('p.status', 1)
-                ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
-                ->groupBy('c.id', 'c.name','c.name_en','c.slug','c.src')
+                ->where(function($query) {
+                    $query->where('p.display', 1)
+                        ->where('p.status', 1)
+                        ->orWhereNull('p.id');
+                })
+                ->select('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->groupBy('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src')
                 ->paginate(14);
 
             return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
@@ -65,10 +68,13 @@ class HomeController extends Controller
             $data = DB::table('category as c')
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->where('c.display', 1)
-                ->where('p.display', 1)
-                ->where('p.status', 1)
-                ->select('c.id', 'c.name','c.name_en','c.slug','c.src', DB::raw('COUNT(p.id) as product_count'))
-                ->groupBy('c.id', 'c.name','c.name_en','c.slug','c.src')
+                ->where(function($query) {
+                    $query->where('p.display', 1)
+                        ->where('p.status', 1)
+                        ->orWhereNull('p.id');
+                })
+                ->select('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src', DB::raw('COUNT(p.id) as product_count'))
+                ->groupBy('c.id', 'c.name', 'c.name_en', 'c.slug', 'c.src')
                 ->get();
 
             return response()->json(['message' => 'Lấy dữ liệu thành công','data'=>$data, 'status' => true]);
